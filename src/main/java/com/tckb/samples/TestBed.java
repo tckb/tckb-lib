@@ -16,13 +16,7 @@
  */
 package com.tckb.samples;
 
-import com.tckb.audio.NonTrivialAudio;
-import com.tckb.util.Utility;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
+import com.tckb.borrowed.tarsos.fft.FFT;
 
 /**
  *
@@ -34,27 +28,40 @@ public class TestBed {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        try {
-            try {
-                System.out.println(new NonTrivialAudio(Utility.UI.getFile(null)).getAudioNormData_multicore(1,10).length);
-                
-                
-                
-                
-                
-                
-                
-            } catch (IOException ex) {
-                Logger.getLogger(TestBed.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (UnsupportedAudioFileException ex) {
-                Logger.getLogger(TestBed.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (LineUnavailableException ex) {
-                Logger.getLogger(TestBed.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } catch (NonTrivialAudio.InvalidChannnelException ex) {
-            Logger.getLogger(TestBed.class.getName()).log(Level.SEVERE, null, ex);
+//        try {
+//            try {
+//                System.out.println(new NonTrivialAudio(Utility.UI.getFile(null)).getAudioNormData_multicore(1,10).length);
+//                
+//                
+//                
+//                
+//                
+//                
+//                
+//            } catch (IOException ex) {
+//                Logger.getLogger(TestBed.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (UnsupportedAudioFileException ex) {
+//                Logger.getLogger(TestBed.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (LineUnavailableException ex) {
+//                Logger.getLogger(TestBed.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        } catch (NonTrivialAudio.InvalidChannnelException ex) {
+//            Logger.getLogger(TestBed.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+
+        
+        float[] data = new float[]{1.f,1.f,1.f,1.f,1.f};
+        FFT fft = new FFT(data.length);
+        fft.forwardTransform(data);
+      
+        for(int i=0;i<data.length;i++){
+            System.out.println(data[i]);
         }
 
+        
+        
+        
+        
     }
 
 }

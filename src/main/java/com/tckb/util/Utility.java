@@ -44,7 +44,7 @@ public final class Utility {
     // Public Meta-Inf
     public final static String About = " Utility toolbox";
     public final static String Ver = "0.1 - beta";
-    public final static String Author = "Chandra Tungathurthi";
+    public final static String Author = "Chandra Tungathurthi<chandra.tungathurthi@rwth-aachen.de>";
     // Public constants
     public final static String WORD_BREAK = " ";
     public final static String LINE_BREAK = System.getProperty("line.separator");
@@ -54,6 +54,7 @@ public final class Utility {
     public final static String J_CLSPTH = System.getProperty("java.class.path");
     public final static String USER_HME = System.getProperty("user.home");
     public final static String USER_DIR = System.getProperty("user.dir");
+   // public final static String VERSION_BUILD = "b"+Long.toString(Calendar.getInstance().getTimeInMillis());
     /**
      * Available computing power in terms of available processors
      */
@@ -127,12 +128,7 @@ public final class Utility {
      * @return
      */
     public static boolean copyToFolder(File fileToCopy, File folder) {
-
-        if (copyToFolderAs(fileToCopy, folder, fileToCopy.getName()) != null) {
-            return true;
-        } else {
-            return false;
-        }
+        return copyToFolderAs(fileToCopy, folder, fileToCopy.getName()) != null;
     }
 
     public static File makeDuplicate(File thisFile) {
@@ -317,7 +313,6 @@ public final class Utility {
         return firstOffset;
     }
 
-    
     public static File createTmpFile(String prx, String sfx) {
         try {
             return File.createTempFile(prx, sfx);
