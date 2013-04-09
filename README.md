@@ -1,14 +1,11 @@
-my-lib-maven
-============
-
-Mavenized 'mylib' project.
-
+my-lib-maven :- Mavenized 'mylib' project.
+-------
 my-lib:
 --------
 
 my private collection of library handy for development.
 
-===
+----
 
 Utility classes and libraries to handle audio data, written primarily in Java.
 Although, porting some of these collections into perl, java is expected. 
