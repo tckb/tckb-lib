@@ -443,33 +443,6 @@ public class Utility {
         return thatObject;
     }
 
-    public static void saveObjectToFile(File thatFile, Object... thisObject) {
-        mylogger.log(Level.INFO, "Saving object{0} to file: {1}", new Object[]{thisObject.hashCode(), thatFile.getAbsolutePath()});
-        ObjectOutputStream stream;
-        try {
-            stream = new ObjectOutputStream(new FileOutputStream(thatFile));
-            stream.writeObject(thisObject);
-            stream.close();
-        } catch (IOException ex) {
-            mylogger.log(Level.SEVERE, "Error: Can not save the object!", ex.getMessage());
-        }
-
-    }
-
-    public static Object[] getObjectFromFile(File thatFile) {
-        mylogger.log(Level.INFO, "Extracting object from file: {0}", thatFile.getAbsolutePath());
-
-        Object[] thatObject = null;
-        try {
-            ObjectInputStream stream = new ObjectInputStream(new FileInputStream(thatFile));
-            thatObject = (Object[]) stream.readObject();
-            stream.close();
-        } catch (Exception ex) {
-            mylogger.log(Level.SEVERE, "Error: Can not extract the object from file", ex.getMessage());
-        }
-        return thatObject;
-    }
-
     
     
     private Utility() {

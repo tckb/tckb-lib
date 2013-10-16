@@ -16,10 +16,6 @@ public class Label {
     private double posAsSample = 0;
     private Integer currRedIx = 0;
     private int posX = -1;
-    private String text = "EMPTY_LABEL";
-    private double sample = 0;
-    private Integer currRedix = 0;
-    private int x = -1;
     private int horizLen_inPixels = 0;
     private int vertLen_inPixels = 0;
     private int posY = -1;
@@ -181,7 +177,6 @@ public class Label {
      */
     public void createBoundingBox() {
         boundingBox = new Rectangle(posX, posY, vertLen_inPixels + 2, horizLen_inPixels + 2);
-    
     }
 
     /**

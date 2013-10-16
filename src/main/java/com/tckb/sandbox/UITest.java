@@ -90,7 +90,6 @@ public class UITest extends javax.swing.JFrame {
         ai.setAudioFile(Utility.UI.getFile(rootPane));
         ai.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomLevel(ai.getDisplay(AudioDisplay.TYPE.WAVEFORM).getMaxZoom());
 
-
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
