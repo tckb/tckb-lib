@@ -13,7 +13,7 @@ import java.io.File;
  *
  * @author tckb
  */
-public class SimpleUI extends javax.swing.JFrame {
+public class SimpleAudioUI extends javax.swing.JFrame {
 
     AudioUI ai = new AudioUI();
     File a;
@@ -21,7 +21,7 @@ public class SimpleUI extends javax.swing.JFrame {
     /**
      * Creates new form UITest
      */
-    public SimpleUI() {
+    public SimpleAudioUI() {
         initComponents();
         ai.setUIPlay(jButton2);
         ai.setDisplayContainer(jScrollPane1);
@@ -109,20 +109,20 @@ public class SimpleUI extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(SimpleUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SimpleAudioUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(SimpleUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SimpleAudioUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(SimpleUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SimpleAudioUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(SimpleUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SimpleAudioUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new SimpleUI().setVisible(true);
+                new SimpleAudioUI().setVisible(true);
             }
         });
     }

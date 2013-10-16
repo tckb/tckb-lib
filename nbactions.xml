@@ -7,7 +7,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xbootclasspath/p:/Users/tckb/Projects/x-libs/Fork_Join_JDK7/jsr166.jar -Xms1G -Xmx2G -classpath %classpath com.tckb.samples.SimpleUI</exec.args>
+                <exec.args>-Xms1G -Xmx2G -classpath %classpath com.tckb.samples.SimpleUI</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.classpathScope>runtime</exec.classpathScope>
             </properties>
@@ -19,7 +19,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xbootclasspath/p:/Users/tckb/Projects/x-libs/Fork_Join_JDK7/jsr166.jar -Xms1G -Xmx2G -classpath %classpath com.tckb.samples.SimpleUI</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xms1G -Xmx2G -classpath %classpath com.tckb.samples.SimpleUI</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.classpathScope>runtime</exec.classpathScope>
                 <jpda.listen>true</jpda.listen>
@@ -32,7 +32,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xbootclasspath/p:/Users/tckb/Projects/x-libs/Fork_Join_JDK7/jsr166.jar -Xms1G -Xmx2G -classpath %classpath com.tckb.samples.SimpleUI</exec.args>
+                <exec.args>-Xms1G -Xmx2G -classpath %classpath com.tckb.samples.SimpleUI</exec.args>
                 <exec.executable>${profiler.java}</exec.executable>
             </properties>
         </action>
