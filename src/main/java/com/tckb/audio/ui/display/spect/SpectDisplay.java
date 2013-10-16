@@ -35,17 +35,17 @@ public class SpectDisplay extends AudioDisplay {
     }
 
     @Override
-    public double getMAX_ZOOM() {
+    public double getMaxZoom() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public double getMIN_ZOOM() {
+    public double getMinZoom() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public double getZoomLevel() {
+    public double getCurrentZoomLevel() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -80,7 +80,7 @@ public class SpectDisplay extends AudioDisplay {
     }
 
     @Override
-    public void setMIN_ZOOM(double MIN_ZOOM) {
+    public void setMinZoom(double MIN_ZOOM) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

@@ -66,8 +66,14 @@
             <artifactId>jsr166</artifactId>
             <version>1.7.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>net.sourceforge.jtransforms</groupId>
+            <artifactId>jtransforms</artifactId>
+            <version>2.4.0</version>
+            <type>jar</type>
+        </dependency>
         
         
     </dependencies>
+    <description>My private collections of useful tools and libraries</description>
 </project>

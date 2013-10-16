@@ -413,7 +413,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
 
     @SuppressWarnings("empty-statement")
     private void filechooserButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filechooserButActionPerformed
-        audFile = Utility.getFileFromUI(myPanel, Utility.wavFileFilter);
+        audFile = Utility.UI.getFile(myPanel, Utility.wavFileFilter);
         myAudio.setAudioFile(audFile);
         myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setCrosshairLen(20);
         myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomLevel(7);;
@@ -438,7 +438,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        File textFile = Utility.getFileFromUI(jPanel1, Utility.txtFileFilter);
+        File textFile = Utility.UI.getFile(jPanel1, Utility.txtFileFilter);
         String[] words = Utility.getWordsInFile(textFile);
 //        System.out.println(words);
         int l = 0;
@@ -564,7 +564,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
         labels.append("# Label / TimeStamp(sec)").append(Utility.LINE_BREAK);
         labels.append("######################").append(Utility.LINE_BREAK);
         for (Label l : labelData) {
-            labels.append(l.getText()).append(" / ").append(myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).getLabelTimeStamp(l.getSample())).append(Utility.LINE_BREAK);
+            labels.append(l.getTitle()).append(" / ").append(myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).getLabelTimeStamp(l.getPosAsSample())).append(Utility.LINE_BREAK);
         }
 
 
@@ -573,7 +573,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
         labels.append("# by AudioUIDemo ");
 
 
-        Utility.loadTextToFile(labels.toString(), Utility.saveFileFromUI(myPanel));
+        Utility.saveStringToFile(labels.toString(), Utility.UI.saveFile(myPanel));
         Utility.UI.showInfoMessage(myPanel, "Labels Exported!");
 
 
@@ -624,7 +624,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
 //        }
 //        //</editor-fold>
 
-        Logger.getLogger("com.tckb").setLevel(Level.OFF);
+        Logger.getLogger("com.tckb").setLevel(Level.INFO);
 
 
         /*

@@ -10,11 +10,10 @@ import com.tckb.audio.part.Block.Reduction;
 import com.tckb.audio.ui.display.AudioDisplay;
 import com.tckb.audio.ui.display.wave.WaveDisplay;
 import com.tckb.audio.ui.display.wave.WvParams;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.MatrixIterator;
 import org.ejml.ops.CommonOps;
 
 /**
@@ -38,7 +37,7 @@ public class AudProcessor {
         this.audio = audio;
         wvParams = new WvParams();
         channel = ch;
-        cachedData = processAudio();
+        cachedData = getRawBlocks();
 
     }
 
@@ -50,22 +49,14 @@ public class AudProcessor {
 
     // TODO: Clean this mess up!
     // this assumes that the size of each sample is 16 bits
-    public final Block[] processAudio() throws InvalidChannnelException {//, int displayWidth) {
+    public final Block[] getRawBlocks() throws InvalidChannnelException {//, int displayWidth) {
 
         // Independent Variables: Constants
-        double[] origDataSamples = audio.getAudioData_fast(channel); // get the first channel
-        System.out.println("Data read!");
-        DenseMatrix64F audioData = new DenseMatrix64F(1, origDataSamples.length);
-        for (int j = 0; j < origDataSamples.length; j++) {
-            audioData.set(0, j, origDataSamples[j]);
-        }
-
-//        globalMax = CommonOps.elementMax(audioData);
-
+        double[] origDataSamples = audio.getAudioNormData(channel); // get the first channel
+        mylogger.log(Level.INFO, "Audio Data read complete: Channel: {0}", channel);
+        DenseMatrix64F audioData = new DenseMatrix64F(1, origDataSamples.length,true,origDataSamples);
+       
         globalMax = 1;
-
-//        CommonOps.divide(CommonOps.elementMax(audioData), audioData);
-
 
         wvParams.SAMPLE_COUNT = origDataSamples.length;
         calWvParams();
@@ -106,24 +97,7 @@ public class AudProcessor {
         return bList;
 
     }
-// TODO: Deprecated method delete
 
-    private Reduction computeReduction(double[] origDataSamples, int pos, int rSize) {
-        ArrayList<Double> data = new ArrayList<Double>();
-
-        for (int j = 0; j < rSize; j++) {
-
-            double value = (double) origDataSamples[pos + j];
-
-            data.add(value);
-        }
-
-        double max = Collections.max(data);
-        double min = Collections.min(data);
-
-        return new Reduction(min, max);
-
-    }
 
     private Reduction computeReduction(DenseMatrix64F rowData, int colS, int size) {
 
@@ -162,7 +136,7 @@ public class AudProcessor {
     //TODO: Fix this!
     public AudioDisplay getWavePanel() {
         WaveDisplay wavePanel = new WaveDisplay(cachedData, wvParams);
-        wavePanel.setZoomLevel(wavePanel.getMIN_ZOOM());
+        wavePanel.setZoomLevel(wavePanel.getMinZoom());
         return wavePanel;
     }
 }

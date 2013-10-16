@@ -159,7 +159,7 @@ public class Utility {
 
     }
 
-    synchronized public static void loadTextToFile(String text, File fname) {
+    synchronized public static void saveStringToFile(String text, File fname) {
         try {
             mylogger.log(Level.INFO, "Loading: [{0}] ->file: [{1}]", new Object[]{text, fname.getAbsolutePath()});
 
@@ -361,52 +361,20 @@ public class Utility {
 
     }
 
-    public static File openFileUI() {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    public static File getFileFromUI(JComponent parent) {
-        JFileChooser jfc = new JFileChooser();
-        jfc.setDialogTitle("Utility: FileChooser");
-        jfc.showOpenDialog(parent);
-
-        return jfc.getSelectedFile();
-
-    }
-
-    public static File saveFileFromUI(JComponent parent) {
-        File f = null;
+    public static File createTmpFile(String prx, String sfx) {
         try {
-            JFileChooser jfc = new JFileChooser();
-            jfc.setDialogTitle("Utility: FileSaver");
-            jfc.showSaveDialog(parent);
-            f = jfc.getSelectedFile();
-
-            f.createNewFile();
-
+            return File.createTempFile(prx, sfx);
         } catch (IOException ex) {
-            mylogger.log(Level.SEVERE, "Error: Can not save file: {0}", ex.getMessage());
-        } finally {
-            return f;
-
+            mylogger.log(Level.SEVERE, "Error: Can not create temp file ", ex);
+            return null;
         }
     }
 
-    public static File getFileFromUI(JComponent parent, FileNameExtensionFilter filter) {
-        JFileChooser jfc = new JFileChooser();
-        jfc.addChoosableFileFilter(filter);
-        jfc.setDialogTitle("Utility: FileChooser");
-        jfc.showOpenDialog(parent);
-
-        return jfc.getSelectedFile();
-
-    }
-
-    public static File createTmpFile(String pxfx, String sfx) {
+    public static File createTmpFile() {
         try {
-            return File.createTempFile(pxfx, sfx);
+            return File.createTempFile("Utility_temp_file-" + String.valueOf(Utility.tic()), ".tmp");
         } catch (IOException ex) {
-            mylogger.log(Level.SEVERE, "Error: Can not create temp file: " + pxfx + sfx, ex);
+            mylogger.log(Level.SEVERE, "Error: Can not create temp file ", ex);
             return null;
         }
     }
@@ -448,6 +416,62 @@ public class Utility {
         return new TimeConvertor().split(milliseconds);
     }
 
+    public static void saveObjectToFile(File thatFile, Object... thisObject) {
+        mylogger.log(Level.INFO, "Saving object{0} to file: {1}", new Object[]{thisObject.hashCode(), thatFile.getAbsolutePath()});
+        ObjectOutputStream stream;
+        try {
+            stream = new ObjectOutputStream(new FileOutputStream(thatFile));
+            stream.writeObject(thisObject);
+            stream.close();
+        } catch (IOException ex) {
+            mylogger.log(Level.SEVERE, "Error: Can not save the object!", ex.getMessage());
+        }
+
+    }
+
+    public static Object[] getObjectFromFile(File thatFile) {
+        mylogger.log(Level.INFO, "Extracting object from file: {0}", thatFile.getAbsolutePath());
+
+        Object[] thatObject = null;
+        try {
+            ObjectInputStream stream = new ObjectInputStream(new FileInputStream(thatFile));
+            thatObject = (Object[]) stream.readObject();
+            stream.close();
+        } catch (Exception ex) {
+            mylogger.log(Level.SEVERE, "Error: Can not extract the object from file", ex.getMessage());
+        }
+        return thatObject;
+    }
+
+    public static void saveObjectToFile(File thatFile, Object... thisObject) {
+        mylogger.log(Level.INFO, "Saving object{0} to file: {1}", new Object[]{thisObject.hashCode(), thatFile.getAbsolutePath()});
+        ObjectOutputStream stream;
+        try {
+            stream = new ObjectOutputStream(new FileOutputStream(thatFile));
+            stream.writeObject(thisObject);
+            stream.close();
+        } catch (IOException ex) {
+            mylogger.log(Level.SEVERE, "Error: Can not save the object!", ex.getMessage());
+        }
+
+    }
+
+    public static Object[] getObjectFromFile(File thatFile) {
+        mylogger.log(Level.INFO, "Extracting object from file: {0}", thatFile.getAbsolutePath());
+
+        Object[] thatObject = null;
+        try {
+            ObjectInputStream stream = new ObjectInputStream(new FileInputStream(thatFile));
+            thatObject = (Object[]) stream.readObject();
+            stream.close();
+        } catch (Exception ex) {
+            mylogger.log(Level.SEVERE, "Error: Can not extract the object from file", ex.getMessage());
+        }
+        return thatObject;
+    }
+
+    
+    
     private Utility() {
     }
 
@@ -644,10 +668,6 @@ public class Utility {
 
     public static class UI {
 
-        public static File openFile() {
-            throw new UnsupportedOperationException("Not yet implemented");
-        }
-
         public static File getFile(JComponent parent) {
             JFileChooser jfc = new JFileChooser();
             jfc.setDialogTitle("Utility: FileChooser");
@@ -664,9 +684,7 @@ public class Utility {
                 jfc.setDialogTitle("Utility: FileSaver");
                 jfc.showSaveDialog(parent);
                 f = jfc.getSelectedFile();
-
                 f.createNewFile();
-
             } catch (IOException ex) {
                 mylogger.log(Level.SEVERE, "Error: Can not save file: {0}", ex.getMessage());
             } finally {
@@ -680,7 +698,6 @@ public class Utility {
             jfc.addChoosableFileFilter(filter);
             jfc.setDialogTitle("Utility: FileChooser");
             jfc.showOpenDialog(parent);
-
             return jfc.getSelectedFile();
 
         }

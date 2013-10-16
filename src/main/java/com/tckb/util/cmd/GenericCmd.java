@@ -8,6 +8,7 @@ import com.tckb.util.Utility;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -145,7 +146,7 @@ public class GenericCmd implements Runnable {
             }
 
             // Load commandlines to the batchFile
-            Utility.loadTextToFile(str, tmpBatchFile);
+            Utility.saveStringToFile(str, tmpBatchFile);
 
             // Execute the batchFile
             myLog.writeln("Executing command: " + cmd + flags);
@@ -193,7 +194,9 @@ public class GenericCmd implements Runnable {
 
 
 
-        } catch (Exception ex) {
+        } catch (IOException ex) {
+            myLog.writeln("Error: " + ex.getMessage());
+        } catch (InterruptedException ex) {
             myLog.writeln("Error: " + ex.getMessage());
         } finally {
 

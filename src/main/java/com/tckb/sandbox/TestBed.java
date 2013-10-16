@@ -5,8 +5,9 @@
 package com.tckb.sandbox;
 
 import com.tckb.audio.NonTrivialAudio.InvalidChannnelException;
+import com.tckb.util.Utility;
+import java.io.File;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.MathContext;
 
 /**
@@ -16,6 +17,10 @@ import java.math.MathContext;
 public class TestBed {
 
     public static void main(String[] args) throws InvalidChannnelException {
+//        edu.emory.mathcs.jtransforms.fft.DoubleFFT_2D fft_double = new DoubleFFT_2D(1, 10);
+
+
+
 //        try {
 //            //        try {
 //            //            NonTrivialAudio audio = new NonTrivialAudio(new File("/Users/tckb/Msc-MI/Thesis/audio@thesis/orig/audiotest_cut.wav"));
@@ -178,12 +183,12 @@ public class TestBed {
 
 
         BigDecimal bigNumber1 = new BigDecimal(3.333336, MathContext.DECIMAL64);
-        BigDecimal bigNumber2 = new BigDecimal(3.333333, MathContext.DECIMAL64);
+        BigDecimal bigNumber2 = new BigDecimal(1212121, MathContext.DECIMAL64);
 
+        File tmp = Utility.createTmpFile();
+        Utility.saveObjectToFile(tmp,bigNumber1,bigNumber2);
 
-
-        System.out.println(bigNumber1.setScale(2, BigDecimal.ROUND_CEILING));
-        System.out.println(bigNumber2.setScale(2, BigDecimal.ROUND_CEILING));
+        System.out.println(" Obhect from file: " + (Object)Utility.getObjectFromFile(tmp)[1]);
 
     }
 }

@@ -102,6 +102,7 @@ public class AudioUI extends Observable {
         @Override
         public void update(Observable o, Object audioFile) {
 
+
             mylogger.info("Sound source changed, Adjusting the controls");
 
 
@@ -112,16 +113,13 @@ public class AudioUI extends Observable {
 
 
                     audio = new NonTrivialAudio((File) audioFile);
+
+
+
                     audLenMS = audio.getDurationInMS();
 
                     aProcesor = AudProcessor.createProcessor(audio, 1);
 
-//                    isTranscriptAvailable = false;
-
-
-
-                    //TODO: Develop AudioProcessor.getZoomLevels(audio) and use that here
-                    // intially display the complete wave
 
 
                     wavPanel = aProcesor.getWavePanel();
@@ -131,7 +129,7 @@ public class AudioUI extends Observable {
                     // Reset the seeker if, defined
                     resetSeekersMS(audLenMS);
 
-                    mylogger.log(Level.INFO, "Sound Clip duration: {0}", audLenMS);
+                    mylogger.log(Level.INFO, "Sound Clip duration: {0} ", com.tckb.util.Utility.toFormatedTimeString(audLenMS.intValue()));
 
 
                     if (autoPlay) {
@@ -152,7 +150,7 @@ public class AudioUI extends Observable {
 
                     this.statusOK = true;
                 } catch (Exception ex) {
-                    mylogger.log(Level.SEVERE, null, ex);
+                    mylogger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
 

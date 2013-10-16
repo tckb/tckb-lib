@@ -87,8 +87,9 @@ public class UITest extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        ai.setAudioFile(Utility.getFileFromUI(rootPane));
-        ai.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomLevel(ai.getDisplay(AudioDisplay.TYPE.WAVEFORM).getMAX_ZOOM());
+        ai.setAudioFile(Utility.UI.getFile(rootPane));
+        ai.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomLevel(ai.getDisplay(AudioDisplay.TYPE.WAVEFORM).getMaxZoom());
+
 
     }//GEN-LAST:event_jButton1ActionPerformed
 

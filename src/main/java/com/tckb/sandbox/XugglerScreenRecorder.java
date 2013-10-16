@@ -5,8 +5,10 @@
 package com.tckb.sandbox;
 
 import com.tckb.util.Utility;
+import com.xuggle.mediatool.IMediaReader;
 import com.xuggle.mediatool.IMediaWriter;
 import com.xuggle.mediatool.ToolFactory;
+import com.xuggle.mediatool.demos.DisplayWebcamVideo;
 import com.xuggle.xuggler.ICodec;
 import java.awt.AWTException;
 import java.awt.Dimension;
@@ -22,19 +24,18 @@ import java.util.concurrent.TimeUnit;
  */
 public class XugglerScreenRecorder {
 
-    private static final double FRAME_RATE = 50;
-    private static final int SECONDS_TO_RUN_FOR = 5;
-    private static final String outputFilename = Utility.USER_HME+"/out.mp4";
+    private static final double FRAME_RATE = 23;
+    private static final int SECONDS_TO_RUN_FOR = 2;
+    private static final String outputFilename = Utility.USER_HME + "/out.mp4";
     private static Dimension screenBounds;
-
+   
     public static void main(String[] args) {
 
 
         // let's make a IMediaWriter to write the file.
 
         final IMediaWriter writer = ToolFactory.makeWriter(outputFilename);
-
-
+        final IMediaReader reader = ToolFactory.makeReader(writer.getContainer());
 
         screenBounds = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -54,7 +55,7 @@ public class XugglerScreenRecorder {
         for (int index = 0; index < SECONDS_TO_RUN_FOR * FRAME_RATE; index++) {
 
 
-
+            System.out.println(" recording: inx:" + index + "/" + SECONDS_TO_RUN_FOR * FRAME_RATE);
 
 
 // take the screen shot
@@ -103,6 +104,11 @@ public class XugglerScreenRecorder {
         // tell the writer to close and write the trailer if  needed
 
         writer.close();
+        
+        ToolFactory.makeViewer();
+        
+        
+        
 
     }
 

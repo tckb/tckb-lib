@@ -7,6 +7,7 @@ package com.tckb.util.cmd;
 import com.tckb.util.Utility;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -18,7 +19,7 @@ import java.util.Map;
  */
 public class GenericCmdv2 extends GenericCmd {
 
-    private LinkedHashMap<String, String> flags = new LinkedHashMap<String, String>();
+    private final LinkedHashMap<String, String> flags = new LinkedHashMap<String, String>();
 
     public GenericCmdv2() {
         super("command");
@@ -34,7 +35,7 @@ public class GenericCmdv2 extends GenericCmd {
     /**
      * Adds a flag ( -flag value ) to the command
      *  
-     * @param flag
+     * @param flag - accepts NULL value
      * @param value 
      */
     public void addFlag(String flag, String value) {
@@ -59,11 +60,7 @@ public class GenericCmdv2 extends GenericCmd {
 
 
             addToFlagList(flags);
-
-
-
-
-            myLog.writeln("Executing command: " + flagList);
+          myLog.writeln("Executing command: " + flagList);
             ProcessBuilder processb = new ProcessBuilder(flagList);
 
             // merge error & output 
@@ -83,7 +80,10 @@ public class GenericCmdv2 extends GenericCmd {
             myLog.writeln("Command executed with return value: " + returnVal);
             myLog.writeln("==============================================");
 
-        } catch (Exception ex) {
+        } catch (IOException ex) {
+            myLog.writeln("Error: " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (InterruptedException ex) {
             myLog.writeln("Error: " + ex.getMessage());
             ex.printStackTrace();
         } finally {
@@ -114,7 +114,7 @@ public class GenericCmdv2 extends GenericCmd {
             }
 
             // Load commandlines to the batchFile
-            Utility.loadTextToFile(str, tmpBatchFile);
+            Utility.saveStringToFile(str, tmpBatchFile);
 
             // Execute the batchFile
             myLog.writeln("Executing command: " + cmd + flags);
@@ -162,7 +162,9 @@ public class GenericCmdv2 extends GenericCmd {
 
 
 
-        } catch (Exception ex) {
+        } catch (IOException ex) {
+            myLog.writeln("Error: " + ex.getMessage());
+        } catch (InterruptedException ex) {
             myLog.writeln("Error: " + ex.getMessage());
         } finally {
 
