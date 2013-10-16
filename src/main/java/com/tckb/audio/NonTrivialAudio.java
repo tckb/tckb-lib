@@ -12,10 +12,6 @@ import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.concurrent.ForkJoinPool;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.AudioFormat;
@@ -81,7 +77,6 @@ public class NonTrivialAudio implements Runnable {
         empty128kBuffer = new byte[CHUNK_SIZE.SIZE_128K.getSize()];
         resetStream();
 
-
     }
 
     @Override
@@ -99,9 +94,6 @@ public class NonTrivialAudio implements Runnable {
                 while (notYetEOF) {
                     if (playing) {
 
-
-
-
                         bytesRead = rawDataStream.read(empty32kBuffer, readPoint, empty32kBuffer.length - readPoint);
                         if (bytesRead == -1) {
                             notYetEOF = false;
@@ -112,20 +104,14 @@ public class NonTrivialAudio implements Runnable {
                         int frames = bytesRead / frameSize;
                         int leftover = bytesRead % frameSize;
 
-
                         totalBytesread += bytesRead;
 
-
                         mylogger.log(Level.FINER, "Readpoint: {2} frames read: {0} leftover frames: {1} current read: {3} totalbytes read: {4}", new Object[]{frames, leftover, readPoint, bytesRead, totalBytesread});
-
-
 
 //                        if (cnt == noOfRuns) {
 //                            mylogger.info(" Seek point reached!");
 //                            skipbytes = bytesLeft;
 //                        }
-
-
                         // send to audioLine
                         audioLine.write(empty32kBuffer, readPoint, bytesRead - leftover); // this one here causes sound to produce
 
@@ -133,8 +119,6 @@ public class NonTrivialAudio implements Runnable {
                         System.arraycopy(empty32kBuffer, bytesRead, empty32kBuffer, 0, leftover);
 
                         readPoint = leftover;
-
-
 
                     } //if playing
                     else {
@@ -207,7 +191,6 @@ public class NonTrivialAudio implements Runnable {
         playing = false;
         audioLine.stop();
 
-
     }
 
     public void stop() {
@@ -227,8 +210,7 @@ public class NonTrivialAudio implements Runnable {
     }
 
     public double getCurrentSecond() {
-        double seconds = 0.0;
-        seconds = audioLine.getFramePosition() / audioLine.getFormat().getFrameRate();
+        double seconds = audioLine.getFramePosition() / audioLine.getFormat().getFrameRate();
         return seconds;
     }
 
@@ -243,7 +225,6 @@ public class NonTrivialAudio implements Runnable {
 
     public double getDurationInSeconds() {
         try {
-
 
             return getDurationInFrames() / audioLine.getFormat().getFrameRate();
 
@@ -278,7 +259,6 @@ public class NonTrivialAudio implements Runnable {
                     int readPoint = 0;
                     int bytesRead = 0;
 
-
                     while (notYetEOF) {
 
                         bytesRead = audioData.read(empty64kBuffer,
@@ -296,7 +276,6 @@ public class NonTrivialAudio implements Runnable {
 
                     }
 
-
                     mylogger.log(Level.INFO, "No of frames:{0}", noOfFrames);
                     //reset
 
@@ -312,15 +291,10 @@ public class NonTrivialAudio implements Runnable {
                 try {
                     audioData.close();
 
-
-
-
                 } catch (IOException ex) {
                     Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-
-
 
             this.totalFrames = noOfFrames;
         }
@@ -341,7 +315,6 @@ public class NonTrivialAudio implements Runnable {
             return seek((int) framesToBeRead);
         }
 
-
     }
 
     public boolean seekMS(double ms) {
@@ -356,17 +329,12 @@ public class NonTrivialAudio implements Runnable {
             return seek((int) (framesToBeRead / 1000));
         }
 
-
     }
 
     public boolean seek(int frames) {
 
         mylogger.log(Level.INFO, "Seeking to frame: {0} / {1} ", new Object[]{frames, this.getDurationInFrames()});
         mylogger.log(Level.FINE, "Frame difference {0}", (frames - this.getCurrentFrame()));
-
-
-
-
 
 // Stop the current play if playing
         if (isRunning()) {
@@ -376,7 +344,6 @@ public class NonTrivialAudio implements Runnable {
         }
 
 // Reset the stream
-
         // try acquiring the lock!
         synchronized (this) {
 
@@ -390,7 +357,6 @@ public class NonTrivialAudio implements Runnable {
                 }
             }
 
-
         }
 //            Thread curTh = Thread.currentThread();
 //            mylogger.info("Current Thread: " + curTh.getName());
@@ -399,19 +365,15 @@ public class NonTrivialAudio implements Runnable {
         //  second * framerate  = frames 
         bytesToSkip = (long) (frames * frameSize); // set the bytes to skip to reach that frame
 
-
         // reading 32k bytes
-
         noOfRuns = Math.floor(bytesToSkip / (32 * 1024));
         bytesLeft = (bytesToSkip % (32 * 1024));
 
         mylogger.log(Level.INFO, "Bytes to skip: {2} no.of times to read: {0} bytes remaining:{1} ", new Object[]{noOfRuns, bytesLeft, bytesToSkip});
 
-
         // Now start playing!
         this.start();                              // start skips if there are any bytes available
         return true;
-
 
     }
 
@@ -421,9 +383,7 @@ public class NonTrivialAudio implements Runnable {
             rawDataStream = AudioSystem.getAudioInputStream(audSrc);
             boolean bytesSkip = false;
 
-
             // check if there are any bytes to skip, if yes then skip!
-
             while (bytesToSkip > 0) {
                 try {
                     mylogger.log(Level.INFO, "Bytes to skip: {0}/{1}", new Object[]{bytesToSkip, rawDataStream.available()});
@@ -439,8 +399,6 @@ public class NonTrivialAudio implements Runnable {
 
             }
 
-
-
             AudioFormat format = rawDataStream.getFormat();
             AudioFormat.Encoding formatEncoding = format.getEncoding();
             if (!(formatEncoding.equals(AudioFormat.Encoding.PCM_SIGNED)
@@ -453,14 +411,9 @@ public class NonTrivialAudio implements Runnable {
             frameSize = format.getFrameSize();
             notYetEOF = true;
 
-
-
-
             if (!bytesSkip) {
-                DataLine.Info info =
-                        new DataLine.Info(SourceDataLine.class, format);
-
-
+                DataLine.Info info
+                        = new DataLine.Info(SourceDataLine.class, format);
 
                 audioLine = (SourceDataLine) AudioSystem.getLine(info);
                 mylogger.fine("Opening audio line");
@@ -471,7 +424,6 @@ public class NonTrivialAudio implements Runnable {
                 audioLine.drain();
                 audioLine.stop();
             }
-
 
             mylogger.log(Level.INFO, "Samples:  {0} Samples / sec @ {1} bits per sample; Frame size: {2}; Big endian : {3} ", new Object[]{audioLine.getFormat().getSampleRate(), audioLine.getFormat().getSampleSizeInBits(), audioLine.getFormat().getFrameSize(), audioLine.getFormat().isBigEndian()});
 
@@ -496,16 +448,9 @@ public class NonTrivialAudio implements Runnable {
             return false;
         } else {
             try {
-                if (rawDataStream.available() <= 0) {
-                    return false;
-                } else {
-                    return true;
-
-
-                }
+                return rawDataStream.available() > 0;
             } catch (IOException ex) {
                 Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, null, ex);
-
 
                 return false;
             }
@@ -517,6 +462,7 @@ public class NonTrivialAudio implements Runnable {
      *
      * @param CurrChannel
      * @return
+     * @throws com.tckb.audio.NonTrivialAudio.InvalidChannnelException
      */
     public double[] getAudioNormData(int CurrChannel) throws InvalidChannnelException {
         CurrChannel = CurrChannel - 1;
@@ -532,21 +478,11 @@ public class NonTrivialAudio implements Runnable {
             int sampleIndex = 0;
             int numChannels = getHeader().getNumberOfChannels();
 
-
             if (CurrChannel < 0 || CurrChannel >= numChannels) {
                 throw new InvalidChannnelException("Channel not found");
             }
 
             int frameLength = getHeader().getDataLength();
-            // length of stream in-terms of frames
-//            int frmSze = (int) myStream.getFormat().getFrameSize(); // 2 , 4 ... bytes per frame
-//            IntBuffer channelBuffer = IntBuffer.allocate(frameLength);
-//            DoubleBuffer channeBuffer = DoubleBuffer.allocate(frameLength);
-            //int[][] toReturn = new int[numChannels][frameLength];
-            //int[] bytesToReturn = new int[frameLength];
-//            byte[] bytes = new byte[frameLength * frmSze];
-
-            //  myStream.read(bytes);
             double[] channeBuffer = new double[frameLength];
             int k = 0;
             for (int t = headerSize; t < buffer.capacity();) {
@@ -563,14 +499,9 @@ public class NonTrivialAudio implements Runnable {
                     //  2^15 as we negative values as well
                     double sample = sample_16bit / Math.pow(2, 15);
 
-//                    System.out.println(sample);
-
                     if (channel == CurrChannel) {
-                        //  bytesToReturn[sampleIndex] = sample;
-//                        channelBuffer.position(t);
                         channeBuffer[k++] = (sample);
                     }
-                    // toReturn[channel][sampleIndex] = sample;
 
                 }
 
@@ -579,10 +510,12 @@ public class NonTrivialAudio implements Runnable {
             buffer.clear();
             mylogger.info("Read complete");
             mylogger.log(Level.INFO, "Finshed in {0} secs", Utility.toc(tic));
-                    
+
             return channeBuffer;
 
-        } catch (Exception ex) {
+        } catch (InvalidChannnelException ex) {
+            Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
@@ -600,14 +533,10 @@ public class NonTrivialAudio implements Runnable {
         int actualFramesToRead = (framesToRead <= framesAvailable) ? framesToRead : framesAvailable;
 
 //        System.out.println("Total frames avilable: " + framesAvailable + " Frames requested: " + framesToRead + " frames read: " + actualFramesToRead);
-
-
         int start = 0 + (channelToRead - 1) * getHeader().getSampleSize();
         int skip = ((noOfChannels - channelToRead) * getHeader().getSampleSize());
 
-
 //        System.out.println("Start byte: " + start + " Skipping bytes: " + skip);
-
         Double[] data = new Double[actualFramesToRead];
         int i = 0;
 // works for only 2-bytes-sample
@@ -625,13 +554,19 @@ public class NonTrivialAudio implements Runnable {
                 break;
             }
 
-
         }
 
         return data;
 
     }
 
+    /**
+     * NB: Experimental!
+     *
+     * @param CurrChannel
+     * @return
+     * @throws com.tckb.audio.NonTrivialAudio.InvalidChannnelException
+     */
     public ArrayList<Double[]> getAudioData_fast2(int CurrChannel) throws InvalidChannnelException {
         CurrChannel = CurrChannel - 1;
         ArrayList<Double[]> channelData = null;
@@ -643,25 +578,14 @@ public class NonTrivialAudio implements Runnable {
             buffer = fchannel.map(FileChannel.MapMode.READ_ONLY, 0, fchannel.size());
 
             buffer.force(); // performance gain??
-
-
-            int headerSize = getHeader().getHeaderSize();
-
             int numChannels = getHeader().getNumberOfChannels();
-
 
             if (CurrChannel < 0 || CurrChannel >= numChannels) {
                 throw new InvalidChannnelException("Channel not found");
             }
 
-
             int frameSize = numChannels * getHeader().getSampleSize();
             int totalFramesInBuffer = buffer.capacity() / frameSize;
-            int totalLengthOfChannel = getHeader().getDataLength();
-
-
-//            System.out.println("frameSize: " + frameSize + " totalFramesInBuffer: " + totalFramesInBuffer);
-
             // chuncks calculated based on frames
 
             int chunk_size = totalFramesInBuffer;
@@ -674,24 +598,13 @@ public class NonTrivialAudio implements Runnable {
                     break;
                 }
 
-
             }
-//            System.out.println("Chunk size determined as: " + chunk_size);
 
-            int nofChunks = new Double(Math.ceil((double) totalFramesInBuffer / chunk_size)).intValue();
-
-//            System.out.println("No of Chunks: " + nofChunks);
             channelData = new ArrayList<Double[]>();
 
-
-            // split the entire channel into chunks
-
             for (int f = 0; f <= totalFramesInBuffer; f += chunk_size) {
-//                System.out.println("Reading chunks");
-//                System.out.println("Buffer position: " + buffer.position());
                 int pos = f * frameSize;
                 buffer.position(pos);
-
 
                 Double[] data = readAudioChunk(chunk_size, buffer, CurrChannel + 1, numChannels);
                 channelData.add(data);
@@ -699,9 +612,9 @@ public class NonTrivialAudio implements Runnable {
 
             }
 
-
-
-        } catch (Exception ex) {
+        } catch (IOException ex) {
+            Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidChannnelException ex) {
             Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
@@ -716,191 +629,127 @@ public class NonTrivialAudio implements Runnable {
         return channelData;
 
     }
+    /*
+     Multicore data reader
+    
+     public SortedMap<Integer, Double[]> getAudioData_fast3(int CurrChannel) throws InvalidChannnelException {
+     CurrChannel = CurrChannel - 1;
+     ArrayList<Double[]> channelData = null;
+     FileChannel fchannel = null;
+     MappedByteBuffer buffer = null;
+     SortedMap<Integer, Double[]> output = new TreeMap<Integer, Double[]>();
+     SortedMap outMap = Collections.synchronizedSortedMap(output);
+     System.out.println("Reading file...");
+     try {
+     fchannel = new FileInputStream(audSrc).getChannel();
+     buffer = fchannel.map(FileChannel.MapMode.READ_ONLY, 0, fchannel.size());
 
-    public SortedMap<Integer, Double[]> getAudioData_fast3(int CurrChannel) throws InvalidChannnelException {
-        CurrChannel = CurrChannel - 1;
-        ArrayList<Double[]> channelData = null;
-        FileChannel fchannel = null;
-        MappedByteBuffer buffer = null;
-        SortedMap<Integer, Double[]> output = new TreeMap<Integer, Double[]>();
-        SortedMap outMap = Collections.synchronizedSortedMap(output);
-        System.out.println("Reading file...");
-        try {
-            fchannel = new FileInputStream(audSrc).getChannel();
-            buffer = fchannel.map(FileChannel.MapMode.READ_ONLY, 0, fchannel.size());
-
-            buffer.force(); // performance gain??
-
-
-            int headerSize = getHeader().getHeaderSize();
-
-            int numChannels = getHeader().getNumberOfChannels();
+     buffer.force(); // performance gain??
 
 
-            if (CurrChannel < 0 || CurrChannel >= numChannels) {
-                throw new InvalidChannnelException("Channel not found");
-            }
+     int headerSize = getHeader().getHeaderSize();
+
+     int numChannels = getHeader().getNumberOfChannels();
 
 
-            int frameSize = numChannels * getHeader().getSampleSize();
-            int totalFramesInBuffer = buffer.capacity() / frameSize;
-            int totalLengthOfChannel = getHeader().getDataLength();
+     if (CurrChannel < 0 || CurrChannel >= numChannels) {
+     throw new InvalidChannnelException("Channel not found");
+     }
 
 
-//            System.out.println("frameSize: " + frameSize + " totalFramesInBuffer: " + totalFramesInBuffer);
-
-            // chuncks calculated based on frames
-
-            int chunk_size = totalFramesInBuffer;
-            // determine the chunk size
-
-            for (CHUNK_SIZE csize : CHUNK_SIZE.values()) {
-
-                if (chunk_size > csize.getSize() && (((int) (chunk_size / csize.getSize())) > 0)) {
-                    chunk_size = csize.getSize(); // got the size 
-                    break;
-                }
+     int frameSize = numChannels * getHeader().getSampleSize();
+     int totalFramesInBuffer = buffer.capacity() / frameSize;
+     int totalLengthOfChannel = getHeader().getDataLength();
 
 
-            }
+     //            System.out.println("frameSize: " + frameSize + " totalFramesInBuffer: " + totalFramesInBuffer);
 
-            int processors = Runtime.getRuntime().availableProcessors();
-            int parallelism = processors;
+     // chuncks calculated based on frames
+
+     int chunk_size = totalFramesInBuffer;
+     // determine the chunk size
+
+     for (CHUNK_SIZE csize : CHUNK_SIZE.values()) {
+
+     if (chunk_size > csize.getSize() && (((int) (chunk_size / csize.getSize())) > 0)) {
+     chunk_size = csize.getSize(); // got the size 
+     break;
+     }
 
 
-            System.out.println("Parallelism: " + parallelism);
+     }
+
+     int processors = Runtime.getRuntime().availableProcessors();
+     int parallelism = processors;
 
 
-
-
-            NaiveMutlicoreAudDataReader dataReader = new NaiveMutlicoreAudDataReader(buffer, frameSize, getHeader().getSampleSize(), chunk_size, numChannels, outMap);
-
-            dataReader.setReaderToAudioChannel(CurrChannel + 1);
-
-            ForkJoinPool pool = new ForkJoinPool(parallelism);
-            pool.invoke(dataReader);
+     System.out.println("Parallelism: " + parallelism);
 
 
 
 
+     NaiveMutlicoreAudDataReader dataReader = new NaiveMutlicoreAudDataReader(buffer, frameSize, getHeader().getSampleSize(), chunk_size, numChannels, outMap);
 
-////            System.out.println("Chunk size determined as: " + chunk_size);
-//
-//            int nofChunks = new Double(Math.ceil((double) totalFramesInBuffer / chunk_size)).intValue();
-//
-////            System.out.println("No of Chunks: " + nofChunks);
-//            channelData = new ArrayList<Double[]>();
-//
-//
-//            // split the entire channel into chunks
-//
-//            for (int f = 0; f <= totalFramesInBuffer; f += chunk_size) {
-////                System.out.println("Reading chunks");
-////                System.out.println("Buffer position: " + buffer.position());
-//                int pos = f * frameSize;
-//                buffer.position(pos);
-//
-//
-//                Double[] data = readAudioChunk(chunk_size, buffer, CurrChannel + 1, numChannels);
-//                channelData.add(data);
-//                data = null;
-//
-//            }
+     dataReader.setReaderToAudioChannel(CurrChannel + 1);
+
+     ForkJoinPool pool = new ForkJoinPool(parallelism);
+     pool.invoke(dataReader);
 
 
 
-        } catch (Exception ex) {
-            Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-//                System.gc();
-                buffer.clear();
-                fchannel.close();
-            } catch (IOException ex) {
-                Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, null, ex);
-            }
 
-        }
-        return outMap;
 
-    }
+     ////            System.out.println("Chunk size determined as: " + chunk_size);
+     //
+     //            int nofChunks = new Double(Math.ceil((double) totalFramesInBuffer / chunk_size)).intValue();
+     //
+     ////            System.out.println("No of Chunks: " + nofChunks);
+     //            channelData = new ArrayList<Double[]>();
+     //
+     //
+     //            // split the entire channel into chunks
+     //
+     //            for (int f = 0; f <= totalFramesInBuffer; f += chunk_size) {
+     ////                System.out.println("Reading chunks");
+     ////                System.out.println("Buffer position: " + buffer.position());
+     //                int pos = f * frameSize;
+     //                buffer.position(pos);
+     //
+     //
+     //                Double[] data = readAudioChunk(chunk_size, buffer, CurrChannel + 1, numChannels);
+     //                channelData.add(data);
+     //                data = null;
+     //
+     //            }
+
+
+
+     } catch (Exception ex) {
+     Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, null, ex);
+     } finally {
+     try {
+     //                System.gc();
+     buffer.clear();
+     fchannel.close();
+     } catch (IOException ex) {
+     Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, null, ex);
+     }
+
+     }
+     return outMap;
+
+     }
+     */
 
     /**
+     * Returns raw data 
      * Channel numbering starts with 1 ... getNoChannels()
      *
      * @param CurrChannel
      * @return
+     * @throws com.tckb.audio.NonTrivialAudio.InvalidChannnelException
      */
-//    public int[] getAudioDataRaw(int CurrChannel) throws InvalidChannnelException {
-//        CurrChannel = CurrChannel - 1;
-//
-//        AudioInputStream myStream = null;
-//        try {
-//            myStream = AudioSystem.getAudioInputStream(audSrc);
-//            try {
-//                int sampleIndex = 0;
-//                int numChannels = myStream.getFormat().getChannels();
-//
-//                if (CurrChannel < 0 || CurrChannel >= numChannels) {
-//                    throw new InvalidChannnelException("Channel not found");
-//                }
-//
-//                int frameLength = (int) myStream.getFrameLength();  // length of stream in-terms of frames
-//
-//                int frmSze = (int) myStream.getFormat().getFrameSize(); // 2 , 4 ... bytes per frame
-//
-//
-//                //int[][] toReturn = new int[numChannels][frameLength];
-//                int[] bytesToReturn = new int[frameLength];
-//                byte[] bytes = new byte[frameLength * frmSze];
-//
-//                myStream.read(bytes);
-//
-//
-//                for (int t = 0; t < bytes.length;) {
-//                    for (int channel = 0; channel < numChannels; channel++) {
-//                        // only read the channels data that is requested
-//
-//                        int low = (int) bytes[t];
-//                        t++;
-//                        int high = (int) bytes[t];
-//                        t++;
-//                        int sample = getSixteenBitSample(high, low);
-//
-//
-//
-//                        if (channel == CurrChannel) {
-//                            bytesToReturn[sampleIndex] = sample;
-//                        }
-//                        // toReturn[channel][sampleIndex] = sample;
-//
-//
-//                    }
-//
-//                    sampleIndex++;
-//                }
-//                bytes = null;
-//                System.gc();
-//                return bytesToReturn;
-//            } catch (IOException ex) {
-//                Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//
-//        } catch (UnsupportedAudioFileException ex) {
-//            Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (IOException ex) {
-//            Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, null, ex);
-//        } finally {
-//            try {
-//                myStream.close();
-//            } catch (IOException ex) {
-//                Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//        }
-//        return null;
-//    }
-
-    public double[] getAudioDataRaw(int CurrChannel) throws InvalidChannnelException {
+    public int[] getAudioDataRaw(int CurrChannel) throws InvalidChannnelException {
         CurrChannel = CurrChannel - 1;
 
         AudioInputStream myStream = null;
@@ -910,45 +759,34 @@ public class NonTrivialAudio implements Runnable {
                 int sampleIndex = 0;
                 int numChannels = myStream.getFormat().getChannels();
 
-
                 if (CurrChannel < 0 || CurrChannel >= numChannels) {
                     throw new InvalidChannnelException("Channel not found");
                 }
-
 
                 int frameLength = (int) myStream.getFrameLength();  // length of stream in-terms of frames
 
                 int frmSze = (int) myStream.getFormat().getFrameSize(); // 2 , 4 ... bytes per frame
 
-
                 //int[][] toReturn = new int[numChannels][frameLength];
-                double[] bytesToReturn = new double[frameLength];
+                int[] bytesToReturn = new int[frameLength];
                 byte[] bytes = new byte[frameLength * frmSze];
 
                 myStream.read(bytes);
-
 
                 for (int t = 0; t < bytes.length;) {
                     for (int channel = 0; channel < numChannels; channel++) {
                         // only read the channels data that is requested
 
-
                         int low = (int) bytes[t];
                         t++;
                         int high = (int) bytes[t];
                         t++;
-                        int sample_16bit = getSixteenBitSample(high, low);
-
-                        // normalize it!
-                        //  2^15 as we negative values as well
-                        // ... -1 0 +1 ... 
-                        double sample = sample_16bit / Math.pow(2, 15);
+                        int sample = getSixteenBitSample(high, low);
 
                         if (channel == CurrChannel) {
                             bytesToReturn[sampleIndex] = sample;
                         }
                         // toReturn[channel][sampleIndex] = sample;
-
 
                     }
 
@@ -1028,12 +866,3 @@ public class NonTrivialAudio implements Runnable {
         }
     }
 }
-// -- DEAD CODE --
-// 
-// empty34kBuffer.length - bytes = readpoint
-//                        if (skipbytes > 0) {
-//                            readPoint = (int) (empty34kBuffer.length - skipbytes);
-//                            skipbytes = 0;
-//                        }
-// -------------------------------------------
-
