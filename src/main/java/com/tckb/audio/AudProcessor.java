@@ -62,7 +62,6 @@ public class AudProcessor {
         calWvParams();
 
         Block bList[] = new Block[wvParams.BLOCK_COUNT]; // 0 -> blockcount-1
-//        Block emptyBlock;
         int bCnt = 0;
         Reduction cRed;
 
@@ -72,27 +71,19 @@ public class AudProcessor {
             int sampleCount = (bCnt < wvParams.BLOCK_COUNT - 1) ? WvParams.BLOCK_16K_SAMPLE : lastBlockRedCount * WvParams.RED_SIZE_SAMPLE;
             mylogger.log(Level.FINE, "Sample count: {0}", sampleCount);
 
-//            emptyBlock = new Block(sampleCount);
 
             for (int k = 0; k < sampleCount; k += WvParams.RED_SIZE_SAMPLE) {
-                //     mylogger.info(sampleCount%RED_SIZE_SAMPLE);
 
-//                cRed = computeReduction(normAudData, s + k, WvParams.RED_SIZE_SAMPLE);
                 cRed = computeReduction(audioData, s + k, WvParams.RED_SIZE_SAMPLE);
                 wvParams.wavData.add(cRed);
-//
-//                if (!emptyBlock.put(cRed)) {
-//                    mylogger.warning("Cann't add anymore!");
-//                    break;
-//                }
+
             }
-//           bList[bCnt++] = emptyBlock;
             bCnt++;
 
         }
         origDataSamples = null;
         // Now, request for garbage collection
-        System.gc();
+        System.gc();    
 
         return bList;
 
@@ -140,22 +131,3 @@ public class AudProcessor {
         return wavePanel;
     }
 }
-//        Dataset data2 = new DefaultDataset();
-//        for (int j = 0; j < rSize; j++) {
-//
-//            double[] value = new double[]{(double) origDataSamples[pos + j]};
-//            Instance instance1 = new DenseInstance(value);
-//            data2.add(instance1);
-//            // mylogger.info(data2);
-//        }
-//               Normalize the samples: Performance overhead?
-//            NormalizeMidrange nmr = new NormalizeMidrange(0,4);
-//            nmr.filter(data2);
-//
-//        Instance maxI = DatasetTools.maxAttributes(data2);
-//        Instance minI = DatasetTools.minAttributes(data2);
-//        Vector2d normRed = new Vector2d(min, max);
-//        normRed.normalize();
-//        // System.out.println(normRed.x+":"+normRed.y);
-//        return new Reduction(normRed.x, normRed.y);
-//        return new Reduction(minI.value(0), maxI.value(0));

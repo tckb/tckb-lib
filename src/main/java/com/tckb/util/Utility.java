@@ -1,6 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013 tckb < Chandra [dot] Tungathurthi [at] rwth-aachen.de >
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.tckb.util;
 
@@ -17,6 +29,7 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
@@ -27,7 +40,7 @@ import javax.swing.text.JTextComponent;
  *
  * @author tckb
  */
-public class Utility {
+public final class Utility {
 
     // Public Meta-Inf
     public final static String About = " Utility toolbox";
@@ -99,8 +112,6 @@ public class Utility {
                     mylogger.info("Copy completed");
                     return newFile;
                 }
-
-
 
             } catch (IOException ex) {
                 mylogger.log(Level.SEVERE, "Something went wrong; error while copying: ", ex);
@@ -248,24 +259,20 @@ public class Utility {
 
     public static String readFileAsString(String fname) {
 
-
         return readFile(new File(fname), true);
     }
 
     public static String readFileAsString(File f) {
-
 
         return readFile(f, true);
     }
 
     public static String readFileAsLongString(String fname) {
 
-
         return readFile(new File(fname), false);
     }
 
     public static String readFileAsLongString(File f) {
-
 
         return readFile(f, false);
     }
@@ -279,7 +286,6 @@ public class Utility {
      */
     public static int searchInTxComp(JTextComponent src, String word) {
         int firstOffset = -1;
-
 
         if (word == null || word.isEmpty()) {
             return -1;
@@ -299,9 +305,6 @@ public class Utility {
         word = word.toLowerCase();
         int lastIndex = 0;
         int wordSize = word.length();
-
-
-
 
         while ((lastIndex = content.indexOf(word, lastIndex)) != -1) {
             int endIndex = lastIndex + wordSize;
@@ -354,10 +357,8 @@ public class Utility {
                 mylogger.log(Level.SEVERE, "Error:", ex);
             }
 
-
             return trList;
         }
-
 
     }
 
@@ -412,7 +413,6 @@ public class Utility {
 
     public static String toFormatedTimeString(int milliseconds) {
 
-
         return new TimeConvertor().split(milliseconds);
     }
 
@@ -443,8 +443,6 @@ public class Utility {
         return thatObject;
     }
 
-    
-    
     private Utility() {
     }
 
@@ -482,7 +480,6 @@ public class Utility {
                 }
             }
 
-
             if (hh > 0) {
                 out.append(hh).append(" Hour(s) ");
             }
@@ -490,8 +487,6 @@ public class Utility {
                 out.append(mm).append(" Minute(s) ");
             }
             out.append(ss).append(" Second(s)");
-
-
 
             return out.toString();
 
@@ -642,8 +637,14 @@ public class Utility {
     public static class UI {
 
         public static File getFile(JComponent parent) {
+
+            return getFile("Utility: FileChooser", parent);
+
+        }
+
+        public static File getFile(String title, JComponent parent) {
             JFileChooser jfc = new JFileChooser();
-            jfc.setDialogTitle("Utility: FileChooser");
+            jfc.setDialogTitle(title);
             jfc.showOpenDialog(parent);
 
             return jfc.getSelectedFile();
@@ -679,6 +680,8 @@ public class Utility {
             JOptionPane.showMessageDialog(parent, message, "Utility: Info", JOptionPane.INFORMATION_MESSAGE);
 
         }
+
+        
     }
 }
 // -DEAD CODE -
