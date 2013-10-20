@@ -41,6 +41,7 @@ public class AudProcessor {
         double duration = audio.getDurationInMS();
 
 // Adjust the rendering factor depending on the length of the audio
+      
         if (duration < 10000) {
             setRenderFactor(2);
 
@@ -53,7 +54,7 @@ public class AudProcessor {
             setRenderFactor(16);
 
         }
-        
+
         return new AudProcessor(audio, ch);
     }
 
