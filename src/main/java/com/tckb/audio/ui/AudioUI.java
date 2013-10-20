@@ -82,6 +82,11 @@ public class AudioUI extends Observable {
 
     }
 
+    public void setContainerDisplay(TYPE type) throws NonTrivialAudio.InvalidChannnelException {
+        defaultObserver.setContainerDisplay(type);
+
+    }
+
     private class SourceObserver implements Observer {
 
         private JSlider seeker;
@@ -89,8 +94,7 @@ public class AudioUI extends Observable {
         private boolean statusOK;
         private JProgressBar seeker2;
         private NonTrivialAudio audio = null;
-        private JScrollPane waveformContainer = null;
-        private AudioDisplay wavPanel = null;
+        private JScrollPane displayContainer = null;
         private AudioDisplay spectPanel = null;
         private ArrayList<Double> timeStamps = null;
         private boolean audioPlaying = false;
@@ -98,39 +102,28 @@ public class AudioUI extends Observable {
         // parameters of audio
         private Double audLenMS = 0.0;
         private Timer playTimer;
+        private boolean audioPanelLinked = true;
+        private AudioDisplay wavPanel = null;
+        private int readChannel = 1; // by default read the first channel
 
         @Override
         public void update(Observable o, Object audioFile) {
 
-
             mylogger.info("Sound source changed, Adjusting the controls");
-
 
             if (audioFile instanceof File) {
                 try {
                     // stop any playing audio 
                     this.stopCurrentPlay();
 
-
                     audio = new NonTrivialAudio((File) audioFile);
-
-
-
                     audLenMS = audio.getDurationInMS();
-
-                    aProcesor = AudProcessor.createProcessor(audio, 1);
-
-
-
-                    wavPanel = aProcesor.getWavePanel();
-                    waveformContainer.setViewportView(wavPanel);
-
+                    aProcesor = AudProcessor.createProcessor(audio, readChannel);
 
                     // Reset the seeker if, defined
                     resetSeekersMS(audLenMS);
 
                     mylogger.log(Level.INFO, "Sound Clip duration: {0} ", com.tckb.util.Utility.toFormatedTimeString(audLenMS.intValue()));
-
 
                     if (autoPlay) {
                         mylogger.fine("Playing audio");
@@ -165,7 +158,6 @@ public class AudioUI extends Observable {
 //            } else {
 //                mylogger.warning("Source not an instance of file");
 //            }
-
         }
 
         private void addUIPlay(JButton aud_play_but) {
@@ -179,7 +171,6 @@ public class AudioUI extends Observable {
                 }
             });
 
-
         }
 
         private void addUIPause(JButton aud_pause_but) {
@@ -190,7 +181,6 @@ public class AudioUI extends Observable {
                     pauseCurrentPlay();
                 }
             });
-
 
         }
 
@@ -235,7 +225,7 @@ public class AudioUI extends Observable {
         }
 
         private void addContainer(JScrollPane aContainer) {
-            this.waveformContainer = aContainer;
+            this.displayContainer = aContainer;
         }
 
         private void pauseCurrentPlay() {
@@ -245,17 +235,14 @@ public class AudioUI extends Observable {
                 audio.pause();
             }
 
-
         }
 
         private void stopCurrentPlay() {
-
 
             if (audio != null) {
                 audio.stop();
                 audioPlaying = false;
             }
-
 
         }
 
@@ -272,10 +259,6 @@ public class AudioUI extends Observable {
             // play the audio
             audio.start();
 
-
-
-
-
             new Thread() {
                 int tsCnt = -1;
                 //TODO: This assumes that the timestamps start from 0.0!
@@ -286,15 +269,12 @@ public class AudioUI extends Observable {
                     // Empty the container first
                     //trContainer.setText("");
 
-
-
                     while (audio != null && audioPlaying) {
                         try {
                             // update only when there is no manaul override
                             if (!manualSeek) {
                                 // System.out.println("update thread: ..good to go!");
                                 updateSeekerMS(audio.getCurrentMS());
-
 
                             } else {
                                 // System.out.println("update thread: I hate manual interactions! pausing...");
@@ -305,15 +285,10 @@ public class AudioUI extends Observable {
                             Logger.getLogger(AudioUI.class.getName()).log(Level.SEVERE, null, ex);
                         }
 
-
-
                     }
 
                 }
             }.start();
-
-
-
 
         }
 
@@ -346,13 +321,18 @@ public class AudioUI extends Observable {
                 seeker2.setBorderPainted(true);
                 seeker2.setStringPainted(true);
             }
-            if (audioPlaying) {
-                wavPanel.updateCrosshairPosition(val / 1000);
-            } else {
-                wavPanel.updateCrosshairPosition(0);
+            // link for wavPanel
+            if (audioPanelLinked) {
+                if (audioPlaying) {
+                    wavPanel.updateCrosshairPosition(val / 1000);
+                } else {
+                    wavPanel.updateCrosshairPosition(0);
 
+                }
             }
 
+            // link for specpanel
+            // link to pther panel
         }
 
         private void resetSeekersMS(double duration) {
@@ -365,7 +345,6 @@ public class AudioUI extends Observable {
                 seeker.setPaintTicks(true);
                 seeker.setMaximum((int) duration);
             }
-
 
             if (seeker2 != null) {
                 seeker2.setValue(0);
@@ -380,16 +359,39 @@ public class AudioUI extends Observable {
         private AudioDisplay getDisplay(AudioDisplay.TYPE type) {
             switch (type) {
                 case WAVEFORM:
-                    return wavPanel;
-
+                    if (wavPanel != null) {
+                        return wavPanel;
+                    } else {
+                        mylogger.severe("WavPanel not initialized! container empty ");
+                        return null;
+                    }
                 case SPECTROGRAM:
-                    return spectPanel;
+                    throw new UnsupportedOperationException("Spectrogram display not yet supported");
+//                    return spectPanel;
                 default:
-                    return null;
+                    throw new IllegalAccessError("Display type not available");
             }
 
+        }
 
+        /**
+         * creates the TYPE panel
+         * @param type
+         * @throws com.tckb.audio.NonTrivialAudio.InvalidChannnelException 
+         */
+        private void setContainerDisplay(TYPE type) throws NonTrivialAudio.InvalidChannnelException {
+            switch (type) {
+                case WAVEFORM:
+                    wavPanel = aProcesor.getWavePanel();
+                    displayContainer.setViewportView(wavPanel);
+                    break;
+                case SPECTROGRAM:
+                    throw new UnsupportedOperationException("Spectrogram display not yet supported");
+//                    displayContainer.setViewportView(specPanel);
+                default:
+                    throw new IllegalAccessError("Display type not available");
 
+            }
         }
     }
 }

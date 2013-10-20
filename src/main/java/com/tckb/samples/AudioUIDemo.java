@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.tckb.samples;
 
+import com.tckb.audio.NonTrivialAudio;
 import com.tckb.audio.part.Label;
 import com.tckb.audio.ui.AudioUI;
 import com.tckb.audio.ui.display.AudioDisplay;
@@ -28,11 +28,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * 
+ *
  * @author tckb
  */
 public class AudioUIDemo extends javax.swing.JFrame {
-
+    
     File audFile, audFile2;
     AudioUI myAudio = new AudioUI();
     AudioUI myAudio2 = new AudioUI();
@@ -43,14 +43,12 @@ public class AudioUIDemo extends javax.swing.JFrame {
      */
     public AudioUIDemo() {
         initComponents();
-
+        
         myAudio.setDisplayContainer(myPanel);
         myAudio.setUIPlay(playAudio);
         myAudio.setUIPause(stopAudio);
         myAudio.setUISeeker(audSlider);
-
-
-
+        
     }
 
     /**
@@ -426,11 +424,18 @@ public class AudioUIDemo extends javax.swing.JFrame {
 
     @SuppressWarnings("empty-statement")
     private void filechooserButActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filechooserButActionPerformed
-        audFile = Utility.UI.getFile(myPanel, Utility.wavFileFilter);
-        myAudio.setAudioFile(audFile);
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setCrosshairLen(20);
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomLevel(7);;
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).showCursor(false);
+        try {
+            audFile = Utility.UI.getFile(myPanel, Utility.wavFileFilter);
+            myAudio.setAudioFile(audFile);
+            myAudio.setContainerDisplay(AudioDisplay.TYPE.WAVEFORM);
+            
+            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setCrosshairLen(20);
+            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomLevel(myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).getMinZoom());
+            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).showCursor(false);
+            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setDisplayInfo("Audio UI Demo - ver0.1-alpha");
+        } catch (NonTrivialAudio.InvalidChannnelException ex) {
+            Logger.getLogger(AudioUIDemo.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }//GEN-LAST:event_filechooserButActionPerformed
 
@@ -441,8 +446,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomStep(Integer.parseInt(zoomStepUI.getText()));
-
-
+        
         myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).zoomOut();
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -462,8 +466,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
             myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setLabelAt(lbl, t);
             l += 2;
         }
-
-
+        
         myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).refreshDisplay();
 
     }//GEN-LAST:event_jButton4ActionPerformed
@@ -476,10 +479,9 @@ public class AudioUIDemo extends javax.swing.JFrame {
         if (!label.getText().isEmpty() && !time.getText().isEmpty()) {
             myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setLabelAt(label.getText(), Double.parseDouble(time.getText()));
             myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).refreshDisplay();
-
+            
         }
-
-
+        
 
     }//GEN-LAST:event_jButton5ActionPerformed
 
@@ -487,7 +489,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
         if (!time.getText().isEmpty()) {
             myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).deleteLabelAt(Double.parseDouble(time.getText()));
             myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).refreshDisplay();
-
+            
         }
     }//GEN-LAST:event_jButton6ActionPerformed
 
@@ -495,13 +497,9 @@ public class AudioUIDemo extends javax.swing.JFrame {
         if (!currPos.getText().isEmpty()) {
             myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setCursorPos(Double.parseDouble(currPos.getText()));
             myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).refreshDisplay();
-
+            
         }
-
-
-
-
-
+        
 
     }//GEN-LAST:event_jButton7ActionPerformed
 
@@ -519,7 +517,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
     }//GEN-LAST:event_jToggleButton2ActionPerformed
 
     private void myPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_myPanelMouseClicked
-
+        
         myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).showCursorAt(evt.getX(), evt.getY());
     }//GEN-LAST:event_myPanelMouseClicked
 
@@ -527,14 +525,12 @@ public class AudioUIDemo extends javax.swing.JFrame {
 
 //        Label l = myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).getLabelAtXY(evt.getX(), evt.getY());
         myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).showCursorAt(evt.getX(), evt.getY());
-
-
-
+        
         if (l != null) {
             myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setLabelAtXY(l, evt.getX(), evt.getY());
 //            System.out.println("Label: " + l.getText());
         }
-
+        
 
     }//GEN-LAST:event_myPanelMouseDragged
 
@@ -567,10 +563,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-
-
-
-
+        
         ArrayList<Label> labelData = myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).getAllLabels();
         StringBuilder labels = new StringBuilder();
         labels.append("#####################").append(Utility.LINE_BREAK);
@@ -579,16 +572,14 @@ public class AudioUIDemo extends javax.swing.JFrame {
         for (Label l : labelData) {
             labels.append(l.getTitle()).append(" / ").append(myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).getLabelTimeStamp(l.getPosAsSample())).append(Utility.LINE_BREAK);
         }
-
-
+        
         labels.append("#####################").append(Utility.LINE_BREAK);
         labels.append("# Labels exported @ ").append(Calendar.getInstance().getTime());
         labels.append("# by AudioUIDemo ");
-
-
+        
         Utility.saveStringToFile(labels.toString(), Utility.UI.saveFile(myPanel));
         Utility.UI.showInfoMessage(myPanel, "Labels Exported!");
-
+        
 
     }//GEN-LAST:event_jButton9ActionPerformed
 
@@ -637,7 +628,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
 //        }
 //        //</editor-fold>
 
-        Logger.getLogger("com.tckb").setLevel(Level.INFO);
+        Logger.getLogger("com.tckb").setLevel(Level.FINEST);
 
 
         /*

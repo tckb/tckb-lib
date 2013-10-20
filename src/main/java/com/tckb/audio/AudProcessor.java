@@ -10,11 +10,9 @@ import com.tckb.audio.part.Block.Reduction;
 import com.tckb.audio.ui.display.AudioDisplay;
 import com.tckb.audio.ui.display.wave.WaveDisplay;
 import com.tckb.audio.ui.display.wave.WvParams;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.data.MatrixIterator;
-import org.ejml.ops.CommonOps;
 
 /**
  *
@@ -27,107 +25,139 @@ public class AudProcessor {
     private int lastBlockSampleCount;
     private int lastBlockRedCount;
     private int fullBlocks;
-    private Block[] cachedData;
-    private NonTrivialAudio audio;
+    private final NonTrivialAudio audio;
+    private final int channel;
+    private static int renderFactor = 1;
     private WvParams wvParams;
-    private int channel;
-    private double globalMax;
 
     private AudProcessor(NonTrivialAudio audio, int ch) throws InvalidChannnelException {
         this.audio = audio;
-        wvParams = new WvParams();
         channel = ch;
-        cachedData = getRawBlocks();
 
     }
 
     public static AudProcessor createProcessor(NonTrivialAudio audio, int ch) throws InvalidChannnelException {
 
-        return new AudProcessor(audio, ch);
+        double duration = audio.getDurationInMS();
 
+// Adjust the rendering factor depending on the length of the audio
+        if (duration < 10000) {
+            setRenderFactor(2);
+
+        }
+        if (duration < 5000) {
+            setRenderFactor(8);
+
+        }
+        if (duration < 2000) {
+            setRenderFactor(16);
+
+        }
+        
+        return new AudProcessor(audio, ch);
     }
 
-    // TODO: Clean this mess up!
-    // this assumes that the size of each sample is 16 bits
-    public final Block[] getRawBlocks() throws InvalidChannnelException {//, int displayWidth) {
-
+    /**
+     * @throws com.tckb.audio.NonTrivialAudio.InvalidChannnelException
+     */
+    public final void calcWvParams() throws InvalidChannnelException {
         // Independent Variables: Constants
-        double[] origDataSamples = audio.getAudioNormData(channel); // get the first channel
+        Double[] origDataSamples = audio.getAudioNormData(channel); // get the first channel
+
         mylogger.log(Level.INFO, "Audio Data read complete: Channel: {0}", channel);
-        DenseMatrix64F audioData = new DenseMatrix64F(1, origDataSamples.length,true,origDataSamples);
-       
-        globalMax = 1;
-
         wvParams.SAMPLE_COUNT = origDataSamples.length;
-        calWvParams();
-
-        Block bList[] = new Block[wvParams.BLOCK_COUNT]; // 0 -> blockcount-1
+        initWvParams();
+        // TODO: remove usuage bList!
+        Block bList[] = new Block[wvParams.BLOCK_COUNT];
         int bCnt = 0;
-        Reduction cRed;
 
         for (int s = 0; bCnt < wvParams.BLOCK_COUNT; s += WvParams.BLOCK_16K_SAMPLE) {
             mylogger.log(Level.FINE, "Filling block:{0}", bCnt);
 
-            int sampleCount = (bCnt < wvParams.BLOCK_COUNT - 1) ? WvParams.BLOCK_16K_SAMPLE : lastBlockRedCount * WvParams.RED_SIZE_SAMPLE;
+            int sampleCount = (bCnt < wvParams.BLOCK_COUNT - 1) ? WvParams.BLOCK_16K_SAMPLE : lastBlockRedCount * wvParams.RED_SIZE_SAMPLE;
             mylogger.log(Level.FINE, "Sample count: {0}", sampleCount);
 
+            for (int k = 0; k < sampleCount; k += wvParams.RED_SIZE_SAMPLE) {
 
-            for (int k = 0; k < sampleCount; k += WvParams.RED_SIZE_SAMPLE) {
+                Double[] rawReductionData = Arrays.copyOfRange(origDataSamples, s + k, (s + k) + wvParams.RED_SIZE_SAMPLE);
 
-                cRed = computeReduction(audioData, s + k, WvParams.RED_SIZE_SAMPLE);
-                wvParams.wavData.add(cRed);
+                if (rawReductionData.length <= 0) {
+                    break;
+                }
+
+                Arrays.sort(rawReductionData);
+                double min = rawReductionData[0];
+                double max = rawReductionData[rawReductionData.length - 1];
+
+                wvParams.wavData.add(new Reduction(min, max));
 
             }
             bCnt++;
 
         }
-        origDataSamples = null;
-        // Now, request for garbage collection
-        System.gc();    
-
-        return bList;
 
     }
 
-
-    private Reduction computeReduction(DenseMatrix64F rowData, int colS, int size) {
-
-        DenseMatrix64F extract = CommonOps.extract(rowData, 0, 1, colS, colS + size);
-        Double max = CommonOps.elementMax(extract) / globalMax;
-        Double min = CommonOps.elementMin(extract) / globalMax;
-
-        return new Reduction(min, max);
-
-    }
-
-    private void calWvParams() {
-
+    private void initWvParams() {
         srate = audio.getSampleRate();
         wvParams.SRATE = srate;
-
         lastBlockSampleCount = wvParams.SAMPLE_COUNT % WvParams.BLOCK_16K_SAMPLE;
-        lastBlockRedCount = lastBlockSampleCount / WvParams.RED_SIZE_SAMPLE; // discard the remaining samples!
+        lastBlockRedCount = lastBlockSampleCount / wvParams.RED_SIZE_SAMPLE; // discard the remaining samples!
         fullBlocks = wvParams.SAMPLE_COUNT / WvParams.BLOCK_16K_SAMPLE;
         wvParams.BLOCK_COUNT = (lastBlockSampleCount != 0) ? (fullBlocks + 1) : fullBlocks;
-        wvParams.ADJ_SAMPLE_COUNT = (fullBlocks * WvParams.BLOCK_16K_SAMPLE) + lastBlockRedCount * WvParams.RED_SIZE_SAMPLE; // adjusting the sample count
+        wvParams.ADJ_SAMPLE_COUNT = (fullBlocks * wvParams.BLOCK_16K_SAMPLE) + lastBlockRedCount * wvParams.RED_SIZE_SAMPLE; // adjusting the sample count
         wvParams.DUR_MS = audio.getDurationInMS();
         wvParams.DUR_SEC = audio.getDurationInSeconds();
-        wvParams.RED_COUNT = fullBlocks * (WvParams.BLOCK_16K_SAMPLE / WvParams.RED_SIZE_SAMPLE) + lastBlockRedCount;
-
-
-
+        wvParams.RED_COUNT = fullBlocks * (WvParams.BLOCK_16K_SAMPLE / wvParams.RED_SIZE_SAMPLE) + lastBlockRedCount;
 
         mylogger.log(Level.FINE, "Sample count={0}", wvParams.SAMPLE_COUNT);
         mylogger.log(Level.FINE, "Last block sample count={0}", lastBlockSampleCount);
         mylogger.log(Level.FINE, "Number of full blocks={0}", fullBlocks);
         mylogger.log(Level.FINE, "Last block red count={0}", lastBlockRedCount);
         mylogger.log(Level.FINE, "No of blocks : {0}", wvParams.BLOCK_COUNT);
+
     }
 
-    //TODO: Fix this!
-    public AudioDisplay getWavePanel() {
-        WaveDisplay wavePanel = new WaveDisplay(cachedData, wvParams);
+    public AudioDisplay getWavePanel() throws InvalidChannnelException {
+        this.wvParams = new WvParams();
+
+        int redSize = (wvParams.RED_SIZE_SAMPLE) / renderFactor;
+
+        if (redSize < WvParams.SAMPLE_SIZE) {
+            redSize = WvParams.SAMPLE_SIZE;
+        }
+        wvParams.RED_SIZE_SAMPLE = redSize;
+        calcWvParams();
+
+        WaveDisplay wavePanel = new WaveDisplay(this.wvParams);
         wavePanel.setZoomLevel(wavePanel.getMinZoom());
         return wavePanel;
     }
+
+    protected static void setRenderFactor(int factor) {
+        renderFactor = factor;
+    }
+
+    /**
+     * Increase render quality at the cost of performance
+     */
+    public void rQualityIN() {
+        renderFactor *= 2;
+
+    }
+
+    public void rQualityOUT() {
+        renderFactor /= 2;
+
+    }
 }
+// Experimental call for check
+//        Double[] origDataSamples_fast = audio.getAudioData_fast2(channel); // get the first channel
+//        System.out.println("faster data length: "+origDataSamples_fast.length);
+//        Double[] origDataSamples_list = new Double[origDataSamples.length];
+//        System.out.println("original data length: "+origDataSamples.length);
+//
+//        
+//        boolean res = Arrays.deepEquals(origDataSamples_fast, Arrays.asList(origDataSamples).toArray(origDataSamples_list));
+//        System.out.println("res: " + res);
+// --END-

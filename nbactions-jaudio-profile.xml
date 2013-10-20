@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xms1G -Xmx2G -classpath %classpath com.tckb.samples.NTAudioDemo</exec.args>
+                <exec.args>-Xms1G -Xmx5G -classpath %classpath com.tckb.samples.NTAudioDemo</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xms1G -Xmx2G -classpath %classpath com.tckb.samples.NTAudioDemo</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xms1G -Xmx5G -classpath %classpath com.tckb.samples.NTAudioDemo</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xms1G -Xmx2G -classpath %classpath com.tckb.samples.NTAudioDemo</exec.args>
+                <exec.args>-Xms1G -Xmx5G -classpath %classpath com.tckb.samples.NTAudioDemo</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -55,6 +55,20 @@
             <properties>
                 <skipTests>true</skipTests>
                 <Env.JAVA_HOME>/Library/Java/Home</Env.JAVA_HOME>
+            </properties>
+        </action>
+        <action>
+            <actionName>build-with-dependencies</actionName>
+            <reactor>also-make</reactor>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>assembly:single</goal>
+            </goals>
+            <properties>
+                <exec.args>-Xms1G -Xmx2G -classpath %classpath com.tckb.samples.AudioUIDemo</exec.args>
+                <exec.executable>${profiler.java}</exec.executable>
             </properties>
         </action>
     </actions>

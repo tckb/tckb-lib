@@ -36,10 +36,10 @@ public class NTAudioDemo {
             File file = Utility.UI.getFile("Choose the audio file", null);
             NonTrivialAudio audio = new NonTrivialAudio(file);
 
-            System.out.println("Audio header info");
+            System.out.println(">>Audio header info");
             System.out.println(audio.getHeader());
 
-            System.out.println("Playing first 10 secs of the audio file");
+            System.out.println(">>Playing first 10 secs of the audio file");
 
             double playTime = (audio.getDurationInSeconds() > 10 ? 10 : audio.getDurationInSeconds());
             audio.start();

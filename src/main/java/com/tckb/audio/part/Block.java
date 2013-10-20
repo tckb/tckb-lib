@@ -16,13 +16,16 @@ public class Block {
 
     private int redCnt;
     private Reduction[] redList;
+    /**
+     * TODO: useless class remove it!s
+     */
+    WvParams wvParams;
 
-    public Block(int size) {
+    public Block(WvParams wvParams, int size) {
+        this.wvParams = wvParams;
 
-
-        redList = new Reduction[getNext(size, WvParams.RED_SIZE_SAMPLE)];
+        redList = new Reduction[getNext(size, wvParams.RED_SIZE_SAMPLE)];
         redCnt = 0;
-
 
     }
 
@@ -32,7 +35,6 @@ public class Block {
         } else {
             return null;
         }
-
 
     }
 
@@ -55,11 +57,10 @@ public class Block {
             return redCnt;
         }
 
-
     }
 
     public int getSize() {
-        return redCnt * WvParams.RED_SIZE_SAMPLE;
+        return redCnt * wvParams.RED_SIZE_SAMPLE;
     }
 
     private int getNext(int a, int b) {
@@ -73,7 +74,7 @@ public class Block {
 
     @Override
     public String toString() {
-        return "[id=" + hashCode() + " RedCount =" + redCnt + " RedSize=" + WvParams.RED_SIZE_SAMPLE + "]";
+        return "[id=" + hashCode() + " RedCount =" + redCnt + " RedSize=" + wvParams.RED_SIZE_SAMPLE + "]";
     }
 
     public static class Reduction {
