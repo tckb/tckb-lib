@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
@@ -62,7 +61,7 @@ public final class Utility {
     public final static FileNameExtensionFilter wavFileFilter = new FileNameExtensionFilter("(*.wav) Microsoft Wave files", "wav");
     public final static FileNameExtensionFilter txtFileFilter = new FileNameExtensionFilter("(*.txt ) Text files", "txt");
     // Private stuff
-    private static final Logger mylogger = Logger.getLogger("com.lia.core");
+    private static final Logger mylogger = Logger.getLogger("com.tckb.util");
 
     private static void copy12(File file1, File file2) {
         try {
@@ -318,50 +317,7 @@ public final class Utility {
         return firstOffset;
     }
 
-    /**
-     *
-     * @param transcriptFile
-     * @return Hashmap of (timestamp, transcriptword) pair
-     */
-    public static HashMap<Double, String> getTrList(File transcriptFile) {
-        HashMap<Double, String> trList = new HashMap<Double, String>();
-
-        String line = null;
-        BufferedReader br = null;
-        try {
-
-            mylogger.log(Level.INFO, "Parsing transcript file:{0}", new Object[]{transcriptFile.getName()});
-            br = new BufferedReader(new FileReader(transcriptFile));
-            while ((line = br.readLine()) != null) {
-
-                String parts[] = line.split(" ");
-
-                Double ts = Double.parseDouble(parts[0]);
-
-                String word = parts[1];
-                trList.put(ts * 1000, word); // store the timestamps as ms
-
-                //  System.out.println("Contains key:" + trList.containsKey(ts) + ":" + trList.get(ts));
-            }
-            // System.out.println(trList);
-            mylogger.log(Level.INFO, "Parsing done; trlist size:{0}", trList.size());
-
-        } catch (FileNotFoundException ex) {
-            mylogger.log(Level.SEVERE, "Error:", ex);
-        } finally {
-
-            try {
-
-                br.close();
-            } catch (IOException ex) {
-                mylogger.log(Level.SEVERE, "Error:", ex);
-            }
-
-            return trList;
-        }
-
-    }
-
+    
     public static File createTmpFile(String prx, String sfx) {
         try {
             return File.createTempFile(prx, sfx);
@@ -396,7 +352,8 @@ public final class Utility {
 
     public static double roundDouble(Double val, int precision) {
 
-        Double dVal = adjDecimalSep(val);
+//        Double dVal = adjDecimalSep(val);
+        Double dVal = val;
 
         BigDecimal bigNumber1 = new BigDecimal(dVal, MathContext.UNLIMITED); // dec 64 - > double precision
         return bigNumber1.setScale(precision, BigDecimal.ROUND_CEILING).doubleValue();
@@ -464,12 +421,16 @@ public final class Utility {
             throw new UnsupportedOperationException("There is no reverse convert!");
         }
 
-        public String split(int current) {
+        public String split(int mills) {
             int hh = 0;
             int mm = 0;
             int ss = 0;
+            int mil = 0;
             StringBuilder out = new StringBuilder();
-            ss = Math.round(current / 1000);
+
+            ss = Math.round(mills / 1000);
+            mil = Math.round(mills % 1000);
+
             if (ss >= 60) { // more than 60 secs
                 mm = Math.round(ss / 60);
                 ss = Math.round(ss % 60);
@@ -481,12 +442,18 @@ public final class Utility {
             }
 
             if (hh > 0) {
-                out.append(hh).append(" Hour(s) ");
+                out.append(hh).append(" Hr ");
             }
             if (mm > 0) {
-                out.append(mm).append(" Minute(s) ");
+                out.append(mm).append(" Mn ");
             }
-            out.append(ss).append(" Second(s)");
+            if (ss > 0) {
+                out.append(ss).append(" S ");
+
+            }
+            if (mil > 0) {
+                out.append(mil).append(" ms");
+            }
 
             return out.toString();
 
@@ -681,7 +648,6 @@ public final class Utility {
 
         }
 
-        
     }
 }
 // -DEAD CODE -

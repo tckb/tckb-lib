@@ -53,17 +53,6 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
-    
-        <dependency>
-            <groupId>xuggle</groupId>
-            <artifactId>xuggle-xuggler</artifactId>
-            <version>5.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.efficient-java-matrix-library</groupId>
-            <artifactId>ejml</artifactId>
-            <version>0.16</version>
-        </dependency>
         <dependency>
             <groupId>org.jdesktop</groupId>
             <artifactId>beansbinding</artifactId>
@@ -74,18 +63,5 @@
             <artifactId>swing-layout</artifactId>
             <version>1.0.3</version>
         </dependency>
-        <dependency>
-            <groupId>org.codehaus.jsr166-mirror</groupId>
-            <artifactId>jsr166</artifactId>
-            <version>1.7.0</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.jtransforms</groupId>
-            <artifactId>jtransforms</artifactId>
-            <version>2.4.0</version>
-            <type>jar</type>
-        </dependency>
-        
-        
     </dependencies>
 </project>

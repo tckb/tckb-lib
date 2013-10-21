@@ -14,13 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.tckb.samples;
 
+import com.tckb.audio.NonTrivialAudio;
 import com.tckb.audio.ui.AudioUI;
 import com.tckb.audio.ui.display.AudioDisplay;
 import com.tckb.util.Utility;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -100,8 +102,12 @@ public class SimpleAudioUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        ai.setAudioFile(Utility.UI.getFile(rootPane));
-        ai.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomLevel(ai.getDisplay(AudioDisplay.TYPE.WAVEFORM).getMinZoom());
+        try {
+            ai.setAudioFile(Utility.UI.getFile(rootPane));
+            ai.setContainerDisplay(AudioDisplay.TYPE.WAVEFORM);
+        } catch (NonTrivialAudio.InvalidChannnelException ex) {
+            Logger.getLogger(SimpleAudioUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }//GEN-LAST:event_jButton1ActionPerformed
 

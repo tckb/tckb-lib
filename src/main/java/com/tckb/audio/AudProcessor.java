@@ -119,7 +119,7 @@ public class AudProcessor {
 
     }
 
-    public AudioDisplay getWavePanel() throws InvalidChannnelException {
+    public WaveDisplay getWavePanel() throws InvalidChannnelException {
         this.wvParams = new WvParams();
 
         int redSize = (wvParams.RED_SIZE_SAMPLE) / renderFactor;

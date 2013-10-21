@@ -476,13 +476,12 @@ public class NonTrivialAudio implements Runnable {
     /**
      * Channel numbering starts with 1 ... getNoChannels()
      *
-     * @param CurrChannel
+     * @param currChannel
      * @return
      * @throws com.tckb.audio.NonTrivialAudio.InvalidChannnelException
      */
-    public Double[] getAudioNormData(int CurrChannel) throws InvalidChannnelException {
-        CurrChannel = CurrChannel - 1;
-        mylogger.log(Level.INFO, "Reading channel:{0}", CurrChannel);
+    public Double[] getAudioNormData(int currChannel) throws InvalidChannnelException {
+        mylogger.log(Level.INFO, "Reading channel:{0}", currChannel);
         long tic = Utility.tic();
         try {
             FileChannel fchannel = new FileInputStream(audSrc).getChannel();
@@ -493,40 +492,31 @@ public class NonTrivialAudio implements Runnable {
 
             int numChannels = getHeader().getNumberOfChannels();
 
-            if (CurrChannel < 0 || CurrChannel >= numChannels) {
+            if (currChannel < 0 || currChannel >= numChannels) {
                 throw new InvalidChannnelException("Channel not found");
             }
-
-            int frameLength = getHeader().getDataLength();
 
 //            double[] channeBuffer = new double[frameLength];
             ArrayList<Double> channelBuffer = new ArrayList<Double>();
 
-            int k = 0;
-            for (int t = headerSize; t < buffer.capacity();) {
-                for (int channel = 0; channel < numChannels; channel++) {
-                    // only read the channels data that is requested
+            int channelByteStart = ( headerSize) + (currChannel - 1) * (getHeader().getSampleSize() / numChannels); // channel numbering starts from 1
+            int channelByteSkip = 1 + (numChannels - 1) * (getHeader().getSampleSize() / numChannels);
+            // only read the channels data that is requested
+            System.out.println("Header size: "+headerSize + " chstart: "+channelByteStart);
+            System.out.println("channelByteSkip: " + channelByteSkip);
 
-                    int low = (int) buffer.get(t);
-                    t++;
-                    int high = (int) buffer.get(t);
-                    t++;
-                    int sample_16bit = getSixteenBitSample(high, low);
+            for (int t = channelByteStart; t < buffer.capacity();) {
 
-                    // normalize it!
-                    //  2^15 as we negative values as well
-                    double sampleNorm = sample_16bit / Math.pow(2, 15);
+                int low = (int) buffer.get(t);
+                t++;
+                int high = (int) buffer.get(t);
+                t += channelByteSkip;
+                int sample_16bit = getSixteenBitSample(high, low);
 
-                    if (channel == CurrChannel) {
-//                        channeBuffer[k++] = (sampleNorm);
-                        channelBuffer.add(sampleNorm);
-//                        System.out.println("Channel data");
-                    } else {
-//                        System.out.println("Not Channel data");
+                //  2^15 as we negative values as well
+                double sampleNorm = sample_16bit / Math.pow(2, 15);                 // normalize it!
 
-                    }
-
-                }
+                channelBuffer.add(sampleNorm);
 
             }
             buffer.clear();
@@ -535,6 +525,9 @@ public class NonTrivialAudio implements Runnable {
             mylogger.log(Level.INFO, "Finshed in {0} secs", Utility.toc(tic));
 
             Double[] chData = new Double[channelBuffer.size()];
+
+            System.out.println("chdata size: " + chData);
+
             return channelBuffer.toArray(chData);
 
         } catch (InvalidChannnelException ex) {
