@@ -33,6 +33,7 @@ public class AudioUI extends Observable {
     private static final Logger mylogger = Logger.getLogger("com.tckb.audio.ui");
     private SourceObserver defaultObserver = null;
     private boolean manualSeek = false;
+    private int targetChannel = 1;
 
     public AudioUI() {
         defaultObserver = new SourceObserver();
@@ -87,6 +88,10 @@ public class AudioUI extends Observable {
 
     }
 
+    public void setChannelToRead(int channel) {
+        this.targetChannel = channel;
+    }
+
     private class SourceObserver implements Observer {
 
         private JSlider seeker;
@@ -104,7 +109,6 @@ public class AudioUI extends Observable {
         private Timer playTimer;
         private boolean audioPanelLinked = true;
         private AudioDisplay wavPanel = null;
-        private int readChannel = 1; // by default read the first channel
 
         @Override
         public void update(Observable o, Object audioFile) {
@@ -118,7 +122,7 @@ public class AudioUI extends Observable {
 
                     audio = new NonTrivialAudio((File) audioFile);
                     audLenMS = audio.getDurationInMS();
-                    aProcesor = AudProcessor.createProcessor(audio, readChannel);
+                    aProcesor = AudProcessor.createProcessor(audio, targetChannel);
 
                     // Reset the seeker if, defined
                     resetSeekersMS(audLenMS);
@@ -376,8 +380,9 @@ public class AudioUI extends Observable {
 
         /**
          * creates the TYPE panel
+         *
          * @param type
-         * @throws com.tckb.audio.NonTrivialAudio.InvalidChannnelException 
+         * @throws com.tckb.audio.NonTrivialAudio.InvalidChannnelException
          */
         private void setContainerDisplay(TYPE type) throws NonTrivialAudio.InvalidChannnelException {
             switch (type) {

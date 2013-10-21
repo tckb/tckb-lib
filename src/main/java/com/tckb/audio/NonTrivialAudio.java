@@ -441,7 +441,7 @@ public class NonTrivialAudio implements Runnable {
                 audioLine.stop();
             }
 
-            mylogger.log(Level.INFO, "Samples:  {0} Samples / sec @ {1} bits per sample; Frame size: {2}; Big endian : {3} ", new Object[]{audioLine.getFormat().getSampleRate(), audioLine.getFormat().getSampleSizeInBits(), audioLine.getFormat().getFrameSize(), audioLine.getFormat().isBigEndian()});
+            mylogger.log(Level.INFO, "Nr Channels: {4} Samples:  {0} Samples / sec @ {1} bits per sample; Frame size: {2}; Big endian : {3} ", new Object[]{audioLine.getFormat().getSampleRate(), audioLine.getFormat().getSampleSizeInBits(), audioLine.getFormat().getFrameSize(), audioLine.getFormat().isBigEndian(),getNoChannels()});
 
         } catch (UnsupportedAudioFileException ex) {
             Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, "Unsupported Audio File", ex);
@@ -492,7 +492,7 @@ public class NonTrivialAudio implements Runnable {
 
             int numChannels = getHeader().getNumberOfChannels();
 
-            if (currChannel < 0 || currChannel >= numChannels) {
+            if (currChannel < 1 || currChannel > numChannels) {
                 throw new InvalidChannnelException("Channel not found");
             }
 
@@ -502,8 +502,7 @@ public class NonTrivialAudio implements Runnable {
             int channelByteStart = ( headerSize) + (currChannel - 1) * (getHeader().getSampleSize() / numChannels); // channel numbering starts from 1
             int channelByteSkip = 1 + (numChannels - 1) * (getHeader().getSampleSize() / numChannels);
             // only read the channels data that is requested
-            System.out.println("Header size: "+headerSize + " chstart: "+channelByteStart);
-            System.out.println("channelByteSkip: " + channelByteSkip);
+           
 
             for (int t = channelByteStart; t < buffer.capacity();) {
 
