@@ -41,7 +41,6 @@ public class AudProcessor {
         double duration = audio.getDurationInMS();
 
 // Adjust the rendering factor depending on the length of the audio
-      
         if (duration < 10000) {
             setRenderFactor(2);
 
@@ -63,7 +62,10 @@ public class AudProcessor {
      */
     public final void calcWvParams() throws InvalidChannnelException {
         // Independent Variables: Constants
-        Double[] origDataSamples = audio.getAudioNormData(channel); // get the first channel
+//        Double[] origDataSamples = audio.getAudioNormData(channel); // get the first channel
+
+        // Test call!
+        Double[] origDataSamples = audio.getAllChannelAudioNormData()[1];
 
         mylogger.log(Level.INFO, "Audio Data read complete: Channel: {0}", channel);
         wvParams.SAMPLE_COUNT = origDataSamples.length;

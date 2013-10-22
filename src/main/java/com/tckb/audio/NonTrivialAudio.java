@@ -9,10 +9,12 @@ import com.tckb.util.Utility;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.IntBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.AudioFormat;
@@ -441,7 +443,7 @@ public class NonTrivialAudio implements Runnable {
                 audioLine.stop();
             }
 
-            mylogger.log(Level.INFO, "Nr Channels: {4} Samples:  {0} Samples / sec @ {1} bits per sample; Frame size: {2}; Big endian : {3} ", new Object[]{audioLine.getFormat().getSampleRate(), audioLine.getFormat().getSampleSizeInBits(), audioLine.getFormat().getFrameSize(), audioLine.getFormat().isBigEndian(),getNoChannels()});
+            mylogger.log(Level.INFO, "Nr Channels: {4} Samples:  {0} Samples / sec @ {1} bits per sample; Frame size: {2}; Big endian : {3} ", new Object[]{audioLine.getFormat().getSampleRate(), audioLine.getFormat().getSampleSizeInBits(), audioLine.getFormat().getFrameSize(), audioLine.getFormat().isBigEndian(), getNoChannels()});
 
         } catch (UnsupportedAudioFileException ex) {
             Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, "Unsupported Audio File", ex);
@@ -499,10 +501,9 @@ public class NonTrivialAudio implements Runnable {
 //            double[] channeBuffer = new double[frameLength];
             ArrayList<Double> channelBuffer = new ArrayList<Double>();
 
-            int channelByteStart = ( headerSize) + (currChannel - 1) * (getHeader().getSampleSize() / numChannels); // channel numbering starts from 1
+            int channelByteStart = (headerSize) + (currChannel - 1) * (getHeader().getSampleSize() / numChannels); // channel numbering starts from 1
             int channelByteSkip = 1 + (numChannels - 1) * (getHeader().getSampleSize() / numChannels);
             // only read the channels data that is requested
-           
 
             for (int t = channelByteStart; t < buffer.capacity();) {
 
@@ -525,14 +526,85 @@ public class NonTrivialAudio implements Runnable {
 
             Double[] chData = new Double[channelBuffer.size()];
 
-            System.out.println("chdata size: " + chData);
-
             return channelBuffer.toArray(chData);
 
         } catch (InvalidChannnelException ex) {
             Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+
+    }
+
+    /**
+     * Returns all the channel data
+     * <br/><br/>
+     * WARNING: More data means more heap space, ensure to allocate enough heap
+     * space
+     *
+     * @return
+     */
+    public Double[][] getAllChannelAudioNormData() {
+        try {
+            int nrChannel = getNoChannels();
+            mylogger.log(Level.INFO, "Number of channels availabele {0}", nrChannel);
+            long tic = Utility.tic();
+            FileChannel fchannel = new FileInputStream(audSrc).getChannel();
+            MappedByteBuffer buffer = fchannel.map(FileChannel.MapMode.READ_ONLY, 0, fchannel.size());
+
+            int headerSize = getHeader().getHeaderSize();
+
+            List<ArrayList<Double>> allChannelDataArray = new ArrayList<ArrayList<Double>>();
+            // Fill with empty arrayList
+            for (int ch = 0; ch < nrChannel; ch++) {
+                allChannelDataArray.add(new ArrayList<Double>());
+            }
+
+            // Get the whole sample, i.e., all channel data
+            int allChannelSample_bytes = getHeader().getSampleSize(); //  = nrChannel*sample_per_channel
+            int singleChannel_bytes = allChannelSample_bytes / nrChannel;
+
+            mylogger.log(Level.INFO, "Sample size for all channel: {0}", allChannelSample_bytes);
+            mylogger.log(Level.INFO, "Sample size per channel: {0}", singleChannel_bytes);
+
+            for (int t = headerSize; t < buffer.capacity() - (nrChannel * singleChannel_bytes);) {
+                // for channels
+                for (int ch = 0; ch < nrChannel; ch++) {
+                    // bytes in each channel
+                    for (int by = 0; by < singleChannel_bytes; by++) {
+
+                        int low = buffer.get(t);
+                        t++;
+                        int high = buffer.get(t);
+                        t++;
+
+                        int sample_16bit = getSixteenBitSample(high, low);
+                        //  2^15 as we negative values as well
+                        Double sampleNorm = sample_16bit / Math.pow(2, 15);
+                        allChannelDataArray.get(ch).add(sampleNorm);
+
+                    }
+                }
+
+            }
+            buffer.clear();
+            Double[][] dataToReturn = new Double[allChannelDataArray.get(0).size()][nrChannel];
+            for (int c = 0; c < allChannelDataArray.size(); c++) {
+                ArrayList<Double> chDList = allChannelDataArray.get(c);
+                Double[] chData = new Double[chDList.size()];
+                dataToReturn[c] = chDList.toArray(chData);
+
+            }
+            allChannelDataArray.clear();
+
+            mylogger.info("Read complete");
+            mylogger.log(Level.INFO, "Finshed in {0} secs", Utility.toc(tic));
+
+            return dataToReturn;
+
+        } catch (IOException ex) {
+            mylogger.log(Level.SEVERE, null, ex);
         }
         return null;
 
