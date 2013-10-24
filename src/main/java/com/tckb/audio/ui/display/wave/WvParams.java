@@ -19,7 +19,7 @@ public final class WvParams {
     public static final int SAMPLE_SIZE = 16;             // 2 bytes-per-sample
 
     //  params adjusted by WaveDisplay
-    public int RED_SIZE_SAMPLE = 256;         // 256 samples[2 bytes]-per-reduction -> 512B-per-reduction
+    public int RED_SIZE_SAMPLE = 512;         // 256 samples[2 bytes]-per-reduction -> 512B-per-reduction
 
     public int PIXEL_COUNT = -1;
     public int SAMPLE_COUNT = -1;

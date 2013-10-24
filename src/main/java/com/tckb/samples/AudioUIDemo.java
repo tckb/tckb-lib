@@ -505,7 +505,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
             // Get the file
             audFile = Utility.UI.getFile(myPanel, Utility.wavFileFilter);
             // Channel to read
-            myAudio.setChannelToRead(1); // read the first channel
+            myAudio.setChannelToRead(2); // read the first channel
             // Attach the file
             myAudio.setAudioFile(audFile);
             // Suggest the type of display desired -- MUST call!
@@ -515,7 +515,8 @@ public class AudioUIDemo extends javax.swing.JFrame {
             myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setCrosshairLen(10);
             myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomLevel(myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).getMinZoom());
             myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).showCursor(false);
-            // myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setDisplayInfo("Audio UI Demo - ver0.1-alpha");
+            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setTimePrecision(4);
+//            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setDisplayInfo("Audio UI Demo - ver0.1-alpha");
         } catch (NonTrivialAudio.InvalidChannnelException ex) {
             Logger.getLogger(AudioUIDemo.class.getName()).log(Level.SEVERE, null, ex);
         }

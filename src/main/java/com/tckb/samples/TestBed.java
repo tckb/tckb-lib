@@ -36,7 +36,7 @@ public class TestBed {
     public static void main(String[] args) {
         try {
             try {
-                System.out.println(new NonTrivialAudio(Utility.UI.getFile(null)).getAudioNormData_multicore(1).length);
+                System.out.println(new NonTrivialAudio(Utility.UI.getFile(null)).getAudioNormData_multicore(1,10).length);
                 
                 
                 

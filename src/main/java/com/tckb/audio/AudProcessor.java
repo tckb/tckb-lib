@@ -141,6 +141,7 @@ public class AudProcessor {
 
         WaveDisplay wavePanel = new WaveDisplay(this.wvParams);
         wavePanel.setZoomLevel(wavePanel.getMinZoom());
+        wavePanel.setDisplayInfo(audio.getFile().getName()+" / Channel: "+channel);
         return wavePanel;
     }
 

@@ -38,22 +38,30 @@ import java.util.logging.Logger;
 public final class MultiCoreAudioDataReader extends RecursiveTask<SortedMap<Integer, Double[]>> {
 
     private int CHUNK_THRESHOLD; // global constants 
-    private ByteBuffer buffer; // audio buffer
-    private int sampleSize;
+    private final ByteBuffer buffer; // audio buffer
     private final int frameSize;
-    private int chunk_size;
-    private int chToRead;
+    private final int chToRead;
     private final int noOfCh;
-    private int availableChunks;
     private int totalFramesInBuffer;
     private int startByte_frame, endByte_frame;
     private static final Logger mylogger = Logger.getLogger("com.tckb.audio");
-    private SortedMap<Integer, Double[]> chunkData;
+    private final SortedMap<Integer, Double[]> chunkData;
     private final int srate;
     private final int byte_per_sample;
     private int midByte_frame;
     private double totalDurationOfbuffer;  // in secs
 
+    /**
+     * SortedMap must be synchronized externally! Use Collection framework
+     *
+     * @param buffer
+     * @param outMap
+     * @param frameSize
+     * @param srate
+     * @param bytes_per_sample
+     * @param channel
+     * @param nrChannel
+     */
     public MultiCoreAudioDataReader(ByteBuffer buffer, SortedMap<Integer, Double[]> outMap, int frameSize, int srate, int bytes_per_sample, int channel, int nrChannel) {
         this.buffer = buffer;
         this.srate = srate;
@@ -62,7 +70,6 @@ public final class MultiCoreAudioDataReader extends RecursiveTask<SortedMap<Inte
         this.chToRead = channel;
         this.noOfCh = nrChannel;
         this.chunkData = outMap;
-        
 
     }
 
@@ -75,16 +82,12 @@ public final class MultiCoreAudioDataReader extends RecursiveTask<SortedMap<Inte
         this.totalFramesInBuffer = (int) (Math.ceil((endByte_frame - startByte_frame) + 1) / frameSize);
         this.totalDurationOfbuffer = (totalFramesInBuffer / srate);
 
-        setCHUNK_THRESHOLD(60); // 4 mins
+        setCHUNK_THRESHOLD(3 * 60); // 4 mins
 
     }
 
     public int getFrameNrInBuffer(int byteNr) {
         return (byteNr % frameSize) != 0 ? (int) (byteNr / frameSize) + 1 : (byteNr / frameSize);
-    }
-
-    public void setReaderToAudioChannel(int channel) {
-        this.chToRead = channel;
     }
 
     public int getCHUNK_THRESHOLD() {
@@ -96,18 +99,8 @@ public final class MultiCoreAudioDataReader extends RecursiveTask<SortedMap<Inte
         this.CHUNK_THRESHOLD = CHUNK_THRESHOLD;
     }
 
-    /**
-     * Reads a chunk of frames of size 'chunk_size'
-     *
-     * @return data
-     */
     private int getSixteenBitSample(int high, int low) {
         return (high << 8) + (low & 0x00ff);
-    }
-
-    @Override
-    public String toString() {
-        return super.toString();
     }
 
     @Override
@@ -165,179 +158,10 @@ public final class MultiCoreAudioDataReader extends RecursiveTask<SortedMap<Inte
 
     }
 
-    public int getFrameNr(int buf_pos) {
-        return (buf_pos / frameSize) + 1;
-    }
-
-    public int getFrameNr_chunk(int chunkNr) {
-        return (chunkNr - 1) * chunk_size;
-    }
-
-    public int getChunkNr(int frameNr) {
-        return (frameNr / chunk_size) + 1;
-    }
-
-    public int getChunkNr_buf(int buf_pos) {
-        return (getFrameNr(buf_pos) / chunk_size) + 1;
-    }
-
-    public int getBufPos(int frameNr) {
-        return (frameNr - 1) * frameSize;
-    }
-
-    public int getBufPos_chunk(int chunkNr) {
-        return (getFrameNr(chunkNr) - 1) * frameSize;
-    }
-
-    public int getEffectiveBufferCapacity(ByteBuffer buffer) {
-        return (buffer.capacity() - buffer.position());
-    }
-
-    public int getNoOfFramesInBuffer(ByteBuffer buffer) {
-        return (int) Math.ceil((double) getEffectiveBufferCapacity(buffer) / frameSize);
-
-    }
-
-    public int getNoOfChunksInBuffer(ByteBuffer buffer) {
-        return (int) Math.ceil((double) getNoOfFramesInBuffer(buffer) / chunk_size);
-    }
-
     private double getDurOfByte(int byteOfFrame) {
 
         return getFrameNrInBuffer(byteOfFrame) / srate;
 
     }
 
-}/*
- protected SortedMap<Integer, Double[]> Oldcompute() {
-
- // Check if the available chunks exceeds threshold
- if (availableChunks <= CHUNK_THRESHOLD) {  // less-than case should not happen in theory
-
- mylogger.log(Level.INFO, "{0}  availableChunks <= CHUNK_THRESHOLD ; COMPUTING...", Thread.currentThread().getName());
-
- for (int f = startByte_frame; f < (startByte_frame + totalFramesInBuffer); f += chunk_size) {
- //                System.out.println("Reading chunks");
- //                System.out.println(Thread.currentThread().getName() + "Frame nr position: " + buffer.position());
- int pos = f * frameSize;
- buffer.position(pos);
- // read in chunks
- Double[] data = readAudioChunk(chunk_size);
- Integer chunkNr = getChunkNr_buf(pos);
- chunkData.put(chunkNr, data);
-
- System.out.println("processing...");
-
- }
-
- } else {
-
- //            System.out.println(Thread.currentThread().getName() + " dividing");
- MultiCoreAudioDataReader leftAudDataReader, rightAudDataReader;
- // Applying Divide - and - conquer rule
- // 'fork' half of the chunks to left 
- // clone the existing buffer
- ByteBuffer copyLeftOfBuffer = buffer.duplicate();
- ByteBuffer copyRightOfBuffer = buffer.duplicate();
-
- int leftStart_frame, leftEnd_frame;
- int rightStart_frame, rightEnd_frame;
-
- leftStart_frame = startByte_frame;
- leftEnd_frame = center_frame;
-
- rightStart_frame = center_frame + 1;
- rightEnd_frame = endByte_frame;
-
- // setup the position
- copyLeftOfBuffer.position(buffer.position());
- copyLeftOfBuffer.limit(getBufPos(leftEnd_frame)); // in-theory, endChunkLtFrameNr should be less than its size
-
- copyLeftOfBuffer = copyLeftOfBuffer.slice();
- // create a 'fork'
-
- leftAudDataReader = new MultiCoreAudioDataReader(copyLeftOfBuffer, frameSize, sampleSize, chunk_size, noOfCh, chunkData);
- //            System.out.println(Thread.currentThread().getName() + " left has:" + leftAudDataReader.availableChunks);
-
- leftAudDataReader.setReaderToAudioChannel(chToRead);
-
- leftAudDataReader.fork();
-
- copyRightOfBuffer.position(getBufPos(rightStart_frame));
- copyRightOfBuffer.limit(buffer.capacity());
-
- rightAudDataReader = new MultiCoreAudioDataReader(copyRightOfBuffer, frameSize, sampleSize, chunk_size, noOfCh, chunkData);
- rightAudDataReader.setReaderToAudioChannel(chToRead);
-
- mylogger.log(Level.INFO, "{2} Splitting left:  C: {3} [  {0} - {1} ] ", new Object[]{leftStart_frame, leftEnd_frame, Thread.currentThread().getName(), getNoOfChunksInBuffer(copyLeftOfBuffer)});
- mylogger.log(Level.INFO, "{2} Splitting right: C: {3}  [  {0} - {1} ] ", new Object[]{rightStart_frame, rightEnd_frame, Thread.currentThread().getName(), getNoOfChunksInBuffer(copyRightOfBuffer)});
-
- SortedMap<Integer, Double[]> map1 = rightAudDataReader.compute();
- SortedMap<Integer, Double[]> map2 = leftAudDataReader.join();
- //rightAudDataReader.fork();
-
- chunkData.putAll(map1);
-
- chunkData.putAll(map2);
-
- // join the result
- // return the result
- // discard the exisiting buffer
- buffer.clear();
-
- //            invokeAll(leftAudDataReader, rightAudDataReader);
- //            System.out.println(Thread.currentThread().getName() + " finished");
- }
- System.out.println(Thread.currentThread().getName() + " :" + chunkData.keySet() + ":" + chunkData.size());
-
- return chunkData;
- }
-
- public MultiCoreAudioDataReader(ByteBuffer buffer, int frameSize, int sampleSize, int chunk_size, int noOfChannels, SortedMap<Integer, Double[]> output) {
- this.buffer = buffer;
- this.sampleSize = sampleSize;
- this.frameSize = frameSize;
- this.noOfCh = noOfChannels;
- this.chunk_size = chunk_size;
- this.chunkData = output;
- this.chToRead = 1; // by default read the first channel
- this.startByte_frame = getFrameNr(buffer.position());
- this.endByte_frame = getFrameNr(buffer.capacity());
- this.center_frame = (startByte_frame + endByte_frame) >> 1; // equal to Math.floor
- this.totalFramesInBuffer = getNoOfFramesInBuffer(buffer);
- this.availableChunks = getNoOfChunksInBuffer(buffer);
- setCHUNK_THRESHOLD(50);
-
- }
- private Double[] readAudioChunk(int framesToRead) {
-
- int framesAvailable = getNoOfFramesInBuffer(buffer);
- int actualFramesToRead = (framesToRead <= framesAvailable) ? framesToRead : framesAvailable;
- //        System.out.println(Thread.currentThread().getName() + " Total frames avilable: " + framesAvailable + " Frames requested: " + framesToRead + " frames read: " + actualFramesToRead);
- int start = 0 + (chToRead - 1) * sampleSize;
- int skip = ((noOfCh - chToRead) * sampleSize);
- //        System.out.println("Start byte: " + start + " Skipping bytes: " + skip);
- Double[] data = new Double[actualFramesToRead];
- int i = 0;
- // works for only 2-bytes-sample
- for (int t = start;
- t < buffer.capacity();
- t += skip) {
-
- int low = buffer.get(t);
- int high = buffer.get(t + 1);
- int sample16bit = getSixteenBitSample(high, low);
-
- double sample = sample16bit / Math.pow(2, 15);
-
- data[i++] = sample; // check if works?
-
- if (i >= actualFramesToRead) {
- break;
- }
-
- }
- return data;
- }
-
- */
+}

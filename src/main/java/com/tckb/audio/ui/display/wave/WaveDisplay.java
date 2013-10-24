@@ -58,6 +58,7 @@ public class WaveDisplay extends AudioDisplay {
     private int cursor_x, cursor_y;
     private boolean showCursor = false;
     private boolean editingLabel;
+    private String waveInfo = "EMPTY INFO";
 
     private void setMaxZoom(double level) {
         mylogger.log(Level.INFO, "Settings max zoom: {0}", level);
@@ -276,7 +277,6 @@ public class WaveDisplay extends AudioDisplay {
         g.draw(new Line2D.Double(WIN_MAX_HORPX - 2, WIN_MIN_VERPX + FONT_CHAR_HEIGHT, WIN_MAX_HORPX - 2, WIN_MIN_VERPX + FONT_CHAR_HEIGHT + 3));
 
 //</editor-fold>
-        
         //<editor-fold defaultstate="collapsed" desc="Paint basic info">
         // Paint display info
         //        String durInfo = Double.toString(Utility.roundDouble(params.DUR_SEC, defaultTimePrec)) + " sec";
@@ -299,55 +299,63 @@ public class WaveDisplay extends AudioDisplay {
         // calc width of the text
         int dinfo_width = g.getFontMetrics().stringWidth(durInfo + cursorInfo + resolInfo) + 5;
         int x = WIN_MAX_HORPX / 2;
-        int y = WIN_MAX_VERPX - 2;
+        int resolY = WIN_MAX_VERPX - 2;
         g.setColor(ChartColor.VERY_DARK_BLUE);
-        g.drawString("Crsr Pos: " + cursorInfo + " / Total: " + durInfo + " / Showing: " + resolInfo, x - dinfo_width, y);
+        g.drawString("Crsr Pos: " + cursorInfo + " / Total: " + durInfo + " / Showing: " + resolInfo, x - dinfo_width, resolY);
+
+        // paint wave info
+        if (displayInfo) {
+            int winfo_width = g.getFontMetrics().stringWidth(waveInfo) + 5;
+            x = WIN_MAX_HORPX / 2;
+            int y = resolY - FONT_CHAR_HEIGHT - 5;
+            g.setColor(ChartColor.VERY_DARK_BLUE);
+            g.drawString(waveInfo, x - winfo_width/2, y);
+        }
 
 //</editor-fold>
-        
-        //<editor-fold defaultstate="collapsed" desc="Pain waveform">
+        //<editor-fold defaultstate="collapsed" desc="Paint waveform">
         int winStart_Red = redNumber(winStart_sample);
         int currPlay_Pxl = 0;
         int mid = interpolate(0, -1, 1, LABEL_HEIGHT, WAVE_HEIGHT);
-        
+
         List<Reduction> currWinRedList = params.wavData.subList(redNumber(winStart_sample), redNumber(winEnd_sample));
-        
+
         while (currPxl < maxPixel) {
-            
+
             g.setColor(new Color(0x40, 0x45, 0xFF));
             g.setStroke(waveStroke);
-            
+
             int currWinPxl_redstart = (int) Math.floor((winEnd_sample - winStart_sample) * currPxl / (params.RED_SIZE_SAMPLE * maxPixel));
             int currWinPxl_redEnd = (int) Math.floor(((winEnd_sample - winStart_sample) * (currPxl + 1) / (params.RED_SIZE_SAMPLE * maxPixel)));
-            
+
             double tmin = Integer.MAX_VALUE;
             double tmax = Integer.MIN_VALUE;
-            
+
             for (int i = currWinPxl_redstart; i < currWinPxl_redEnd; i++) {
                 tmax = Math.max(tmax, currWinRedList.get(i).getMax());
                 tmin = Math.min(tmin, currWinRedList.get(i).getMin());
             }
-            
+
             int currPlay_redix = (redNumber(currPlay_sample) - winStart_Red - 1);
-            
+
             // interpolate tmin & tmax to the current width and height
             int tmin_adj = interpolate(tmin, -1, 1, LABEL_HEIGHT, WAVE_HEIGHT);
             int tmax_adj = interpolate(tmax, -1, 1, LABEL_HEIGHT, WAVE_HEIGHT);
-            
+
             mylogger.log(Level.FINEST, "Interpolating wavepixels old/new: {0}/{1}, {2}/{3}  ", new Object[]{tmin, tmin_adj, tmax, tmax_adj});
             cachRed.put(currPxl, new Reduction(tmax_adj, tmin_adj));
 //            cachSamples.put(currPxl, currPlay_sample);
-            
+
 //          Condition to avoid spurious peaks
             if (tmax_adj - tmin_adj < ((WAVE_HEIGHT - LABEL_HEIGHT - 10) / 2)) {
-                
+
                 // save current sec for ccrosshair pointer
                 if (currPlay_redix >= currWinPxl_redstart && currPlay_redix <= currWinPxl_redEnd) {
-                    
+
                     currPlay_Pxl = currPxl;
-                    
+
                 }
-                
+
                 // Save the adjusted reductions
                 // draw current pixel
                 if (displayPixels) {
@@ -359,10 +367,10 @@ public class WaveDisplay extends AudioDisplay {
                     for (Label l : labels) {
                         Double sample = l.getPosAsSample();
                         int sample_redix = (redNumber(sample) - winStart_Red - 1);
-                        
+
                         // if the label is in  crrent window
                         if (sample_redix >= currWinPxl_redstart && sample_redix <= currWinPxl_redEnd && !l.isVisible()) {
-                            
+
                             int bb_x, bb_y;
                             double samples;
                             if (!l.isOverride()) {
@@ -374,122 +382,121 @@ public class WaveDisplay extends AudioDisplay {
                             else {
                                 bb_x = l.getHorzPixel();
                                 bb_y = l.getVertPixel();
-                                
+
                                 samples = (winStart_sample + bb_x * (windowSize_sample / WIN_MAX_HORPX));
                                 l.setPosAsSample(samples);
                                 l.setOverride(false);
-                                
+
                             }
-                            
+
                             String timeText = Utility.roundDouble(samples / params.SRATE, defaultTimePrec) + " sec";
                             int timeTextLen = g.getFontMetrics().stringWidth(timeText);
                             int labelLen = g.getFontMetrics().stringWidth(l.getTitle());
                             int horLen = (labelLen >= timeTextLen) ? labelLen : timeTextLen;
                             int vertLen = 2 * FONT_CHAR_HEIGHT + 1;
-                            
+
                             l.setHorizLen_inPixels(horLen + 1);
                             l.setVertLen_inPixels(vertLen);
                             l.setCurrRedIx(sample_redix);
                             l.setHorzPixel(bb_x + 6);
                             l.setVertPixel(bb_y - 12);
-                            
+
                             l.createBoundingBox(); // must be called explictly!
 //                            l.setOverride(false); // reset!
-                            
+
                             g.setColor(ChartColor.VERY_LIGHT_GREEN);
                             // draw line
                             g.draw(new Line2D.Double(bb_x, bb_y - 7, bb_x, tmin_adj - 1));
                             g.draw(new Line2D.Double(bb_x, bb_y - 7, bb_x + 2, bb_y - 7));
-                            
+
                             // draw label
                             g.setColor(ChartColor.VERY_DARK_MAGENTA);
                             g.drawString(l.getTitle(), bb_x + 7, bb_y); // label - text
                             g.setColor(ChartColor.VERY_DARK_YELLOW);
-                            
+
                             g.drawString(timeText, bb_x + 7, bb_y + FONT_CHAR_HEIGHT); // label - time
-                            
+
                             // draw bounding box
                             if (editingLabel) {
                                 g.setStroke(labelBBStroke);
                                 g.drawRect(l.getHorzPixel(), l.getVertPixel(), l.getHorizLen_inPixels(), l.getVertLen_inPixels());
                             }
-                            
+
                             l.setVisible(true);
-                            
+
                             currWinLabel.add(l);
-                            
+
 //                    }
                         }
-                        
+
                     }
                 }
 //
 //
-                
+
             }
-            
+
             currPxl++;
-            
+
             if (showCursor) {
                 // horizontal line
                 g.setColor(ChartColor.VERY_DARK_GREEN);
-                g.draw(new Line2D.Double(cursor_x, LABEL_HEIGHT + 10, cursor_x, WIN_MAX_VERPX - FONT_CHAR_HEIGHT - 2));
+                g.draw(new Line2D.Double(cursor_x, LABEL_HEIGHT + 10, cursor_x, WIN_MAX_VERPX - 2 * FONT_CHAR_HEIGHT - 5));
                 // vertical line
 //            g.draw(new Line2D.Double(0, cursor_y, WIN_MAX_HORPX, cursor_y));
-                
+
             }
-            
+
         }
 //</editor-fold>
-        
+
         //<editor-fold defaultstate="collapsed" desc="Pain cross-hair">
         mylogger.finest("Painting crosshair");
-        
+
         int p = currPlay_Pxl - crosshairLen;
         int i = 1;
-        
+
         while (i <= (2 * crosshairLen) + 1) {
             if ((p + i) > 0 && (p + i) < maxPixel && (p + i) < cachRed.size()) {
-                
+
                 double max = cachRed.get((p + i)).getMax();
                 double min = cachRed.get((p + i)).getMin();
-                
+
                 if ((max - min) < ((WAVE_HEIGHT - LABEL_HEIGHT - 10) / 2)) {
-                    
+
                     // crosshair-length
                     g.setStroke(waveStroke);
                     g.setColor(ChartColor.VERY_DARK_BLUE);
                     g.draw(new Line2D.Double(p + i, min, p + i, max));
-                    
+
                     // crosshair-top
                     g.setColor(ChartColor.DARK_CYAN);
                     g.draw(new Line2D.Double(p + i, max - 0.2, p + i, max + 0.2));
                     g.setColor(ChartColor.DARK_YELLOW);
-                    
+
                     g.draw(new Line2D.Double(p + i, min - 0.2, p + i, min + 0.2));
-                    
+
                     // crosshair time
                     if ((p + i) == currPlay_Pxl) {
                         g.setStroke(currPointerStroke);
                         // draw pulse
                         g.setColor(ChartColor.LIGHT_RED);
                         g.draw(new Line2D.Double((p + i), mid + 0.5, (p + i), mid - 0.5));
-                        
+
                         // draw string
                         g.drawString(Double.toString(Utility.roundDouble(currPlay_sample / params.SRATE, defaultTimePrec)) + " sec", (p + i) - 5, WIN_TIME_HEIGHT + 2);
                         g.setStroke(waveStroke);
                         // draw pointer
                         g.draw(new Line2D.Double((p + i), WIN_TIME_HEIGHT + 2, (p + i), WIN_TIME_HEIGHT + 5));
-                        
+
                     }
-                    
+
                 }
             }
             i++;
         }
 //</editor-fold>
-        
-        
+
         // Reset label visibility
         for (Label l : labels) {
             l.setVisible(false);
@@ -695,7 +702,7 @@ public class WaveDisplay extends AudioDisplay {
 
     @Override
     public void setDisplayInfo(String info) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.waveInfo = info;
     }
 
     @Override
