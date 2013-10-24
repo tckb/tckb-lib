@@ -7,7 +7,6 @@ package com.tckb.audio;
 import com.tckb.audio.NonTrivialAudio.InvalidChannnelException;
 import com.tckb.audio.part.Block;
 import com.tckb.audio.part.Block.Reduction;
-import com.tckb.audio.ui.display.AudioDisplay;
 import com.tckb.audio.ui.display.wave.WaveDisplay;
 import com.tckb.audio.ui.display.wave.WvParams;
 import java.util.Arrays;
@@ -41,7 +40,7 @@ public class AudProcessor {
         double duration = audio.getDurationInMS();
 
 // Adjust the rendering factor depending on the length of the audio
-        if (duration < 10000) {
+        if (duration < 15000) {
             setRenderFactor(2);
 
         }
@@ -61,11 +60,19 @@ public class AudProcessor {
      * @throws com.tckb.audio.NonTrivialAudio.InvalidChannnelException
      */
     public final void calcWvParams() throws InvalidChannnelException {
-        // Independent Variables: Constants
-//        Double[] origDataSamples = audio.getAudioNormData(channel); // get the first channel
 
-        // Test call!
-        Double[] origDataSamples = audio.getAllChannelAudioNormData()[1];
+        Double[] origDataSamples;
+
+        double dur_secs = audio.getDurationInSeconds();
+        
+        if (dur_secs >= (8 * 60)) {
+             mylogger.info("Duration exceeds the limit; using mulitcore data reader; expect high CPU usage!");
+            origDataSamples = audio.getAudioNormData_multicore(channel, (int) Math.round(dur_secs * 0.1));
+
+        } else {
+             mylogger.info("Duration in the limit; using single core data reader");
+            origDataSamples = audio.getAudioNormData(channel); // get the first channel
+        }
 
         mylogger.log(Level.INFO, "Audio Data read complete: Channel: {0}", channel);
         wvParams.SAMPLE_COUNT = origDataSamples.length;

@@ -9,12 +9,15 @@ import com.tckb.util.Utility;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.IntBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.concurrent.ForkJoinPool;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.AudioFormat;
@@ -451,6 +454,15 @@ public class NonTrivialAudio implements Runnable {
             Logger.getLogger(NonTrivialAudio.class.getName()).log(Level.SEVERE, "Exception", ex);
         }
 
+    }
+
+    /**
+     * Returns the sample per channel in bytes
+     *
+     * @return
+     */
+    public int getSampleSizeInBytes() {
+        return audioLine.getFormat().getSampleSizeInBits() / Byte.SIZE;
     }
 
     private void startThread() {
@@ -909,6 +921,63 @@ public class NonTrivialAudio implements Runnable {
             }
         }
         return null;
+    }
+
+    /**
+     * Highly experimental!
+     *
+     * Consumes a lot of heap!
+     *
+     * @param channel
+     * @param chunk_dur_secs 0 to pickup default
+     * @return
+     * @throws com.tckb.audio.NonTrivialAudio.InvalidChannnelException
+     */
+    public Double[] getAudioNormData_multicore(int channel, int chunk_dur_secs) throws InvalidChannnelException {
+        try {
+            mylogger.log(Level.INFO, "Reading channel:{0}", channel);
+            mylogger.log(Level.INFO, "Duration in seconds: {0}", this.getDurationInSeconds());
+
+            long tic = Utility.tic();
+            FileChannel fchannel = new FileInputStream(audSrc).getChannel();
+            MappedByteBuffer buffer = fchannel.map(FileChannel.MapMode.READ_ONLY, 0, fchannel.size());
+
+            int numChannels = getHeader().getNumberOfChannels();
+
+            if (channel < 1 || channel > numChannels) {
+                throw new InvalidChannnelException("Channel not found");
+            }
+
+            SortedMap<Integer, Double[]> outMap = new TreeMap<Integer, Double[]>();
+            outMap = Collections.synchronizedSortedMap(outMap);
+
+            MultiCoreAudioDataReader dataReader = new MultiCoreAudioDataReader(buffer, outMap, getHeader().getSampleSize(), getSampleRate(), getSampleSizeInBytes(), channel, numChannels);
+            chunk_dur_secs = (chunk_dur_secs > 0) ? chunk_dur_secs : dataReader.getCHUNK_THRESHOLD();
+            dataReader.setCHUNK_THRESHOLD(chunk_dur_secs);
+
+            dataReader.initReader(0, buffer.capacity());
+
+            ForkJoinPool pool = new ForkJoinPool(Utility.compCores * 4);
+            outMap = pool.invoke(dataReader);
+            ArrayList<Double> dataToReturnArray = new ArrayList<Double>();
+
+            for (Double[] partData : outMap.values()) {
+                dataToReturnArray.addAll(Arrays.asList(partData));
+            }
+            Double[] dataToReturn = new Double[dataToReturnArray.size()];
+            dataToReturn = dataToReturnArray.toArray(dataToReturn);
+            dataToReturnArray.clear();
+
+            mylogger.info("Read complete");
+            mylogger.log(Level.INFO, "Finshed in {0} secs", Utility.toc(tic));
+
+            return dataToReturn;
+
+        } catch (Exception ex) {
+            mylogger.log(Level.SEVERE, null, ex);
+        }
+        return null;
+
     }
 
     private int getSixteenBitSample(int high, int low) {
