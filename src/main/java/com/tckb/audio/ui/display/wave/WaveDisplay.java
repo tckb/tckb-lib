@@ -309,14 +309,15 @@ public class WaveDisplay extends AudioDisplay {
             x = WIN_MAX_HORPX / 2;
             int y = resolY - FONT_CHAR_HEIGHT - 5;
             g.setColor(ChartColor.VERY_DARK_BLUE);
-            g.drawString(waveInfo, x - winfo_width/2, y);
+            g.drawString(waveInfo, x - winfo_width / 2, y);
         }
 
 //</editor-fold>
         //<editor-fold defaultstate="collapsed" desc="Paint waveform">
         int winStart_Red = redNumber(winStart_sample);
         int currPlay_Pxl = 0;
-        int mid = interpolate(0, -1, 1, LABEL_HEIGHT, WAVE_HEIGHT);
+        int mid = transformRange(0, -1, 1, LABEL_HEIGHT, WAVE_HEIGHT);
+
 
         List<Reduction> currWinRedList = params.wavData.subList(redNumber(winStart_sample), redNumber(winEnd_sample));
 
@@ -328,6 +329,9 @@ public class WaveDisplay extends AudioDisplay {
             int currWinPxl_redstart = (int) Math.floor((winEnd_sample - winStart_sample) * currPxl / (params.RED_SIZE_SAMPLE * maxPixel));
             int currWinPxl_redEnd = (int) Math.floor(((winEnd_sample - winStart_sample) * (currPxl + 1) / (params.RED_SIZE_SAMPLE * maxPixel)));
 
+            // BugFix: RedNr exceeds available redNr
+            currWinPxl_redEnd = (currWinPxl_redEnd >= params.wavData.size()) ? params.wavData.size() - 1 : currWinPxl_redEnd;
+
             double tmin = Integer.MAX_VALUE;
             double tmax = Integer.MIN_VALUE;
 
@@ -338,11 +342,11 @@ public class WaveDisplay extends AudioDisplay {
 
             int currPlay_redix = (redNumber(currPlay_sample) - winStart_Red - 1);
 
-            // interpolate tmin & tmax to the current width and height
-            int tmin_adj = interpolate(tmin, -1, 1, LABEL_HEIGHT, WAVE_HEIGHT);
-            int tmax_adj = interpolate(tmax, -1, 1, LABEL_HEIGHT, WAVE_HEIGHT);
+            // transformRange tmin & tmax to the current width and height
+            int tmin_adj = transformRange(tmin, -1, 1, LABEL_HEIGHT, WAVE_HEIGHT);
+            int tmax_adj = transformRange(tmax, -1, 1, LABEL_HEIGHT, WAVE_HEIGHT);
 
-            mylogger.log(Level.FINEST, "Interpolating wavepixels old/new: {0}/{1}, {2}/{3}  ", new Object[]{tmin, tmin_adj, tmax, tmax_adj});
+            mylogger.log(Level.FINEST, "Tranforming wavepixels old/new: {0}/{1}, {2}/{3}  ", new Object[]{tmin, tmin_adj, tmax, tmax_adj});
             cachRed.put(currPxl, new Reduction(tmax_adj, tmin_adj));
 //            cachSamples.put(currPxl, currPlay_sample);
 
@@ -526,7 +530,7 @@ public class WaveDisplay extends AudioDisplay {
 
     }
 
-    public int interpolate(double oldValue, double oldRangeMin, double oldRangeMax, double newRangeMin, double newRangeMax) {
+    public int transformRange(double oldValue, double oldRangeMin, double oldRangeMax, double newRangeMin, double newRangeMax) {
         mylogger.log(Level.FINEST, "Interpolating {0} [ {1}, {2} ] -> [ {3}, {4}] ", new Object[]{oldValue, oldValue, oldRangeMax, newRangeMin, newRangeMax});
 
         int scale = (int) Math.round((newRangeMax - newRangeMin) / (oldRangeMax - oldRangeMin));
@@ -583,7 +587,14 @@ public class WaveDisplay extends AudioDisplay {
     }
 
     private int redNumber(double sample) {
-        return ((int) Math.floor(sample / params.RED_SIZE_SAMPLE));
+        int redNr = ((int) Math.floor(sample / params.RED_SIZE_SAMPLE));
+
+        // BugFix: Since last data samples are discareded some times redNr might cross the maximum available!
+        if (redNr >= params.wavData.size()) {
+            redNr = params.wavData.size() - 1;
+        }
+
+        return redNr;
     }
 
     @Override
