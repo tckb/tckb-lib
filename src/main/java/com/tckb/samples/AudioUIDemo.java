@@ -77,7 +77,6 @@ public class AudioUIDemo extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         zoomStepUI = new javax.swing.JTextField();
         jButton3 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
         playAudio = new javax.swing.JButton();
         stopAudio = new javax.swing.JButton();
         currPos = new javax.swing.JTextField();
@@ -85,6 +84,8 @@ public class AudioUIDemo extends javax.swing.JFrame {
         jToggleButton1 = new javax.swing.JToggleButton();
         jToggleButton3 = new javax.swing.JToggleButton();
         jButton8 = new javax.swing.JButton();
+        readChannelField = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
         jButton4 = new javax.swing.JButton();
         label = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -154,7 +155,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        aboutFrame.setSize(500, 180);
+        aboutFrame.setSize(500, 200);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("AudioUI Demo : ver0.1-alpha");
@@ -191,14 +192,14 @@ public class AudioUIDemo extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setText("Z+");
+        jButton1.setText("+");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Z-");
+        jButton2.setText("-");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -206,6 +207,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
         });
 
         zoomStepUI.setText("1");
+        zoomStepUI.setToolTipText(" Yoom step ( seconds )");
 
         jButton3.setText("<->");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -213,8 +215,6 @@ public class AudioUIDemo extends javax.swing.JFrame {
                 jButton3ActionPerformed(evt);
             }
         });
-
-        jLabel1.setText("sec");
 
         playAudio.setText("Play");
 
@@ -259,6 +259,10 @@ public class AudioUIDemo extends javax.swing.JFrame {
             }
         });
 
+        readChannelField.setText("1");
+
+        jLabel11.setText("Channel");
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -270,22 +274,26 @@ public class AudioUIDemo extends javax.swing.JFrame {
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, myPanel)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(filechooserBut)
+                            .add(jPanel1Layout.createSequentialGroup()
+                                .add(filechooserBut)
+                                .add(18, 18, 18)
+                                .add(jLabel11)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(readChannelField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 33, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(jPanel1Layout.createSequentialGroup()
                                 .add(playAudio)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(stopAudio)))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 108, Short.MAX_VALUE)
-                        .add(zoomStepUI, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 33, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jLabel1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(jButton1)
-                            .add(jButton2))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jButton3)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(jPanel1Layout.createSequentialGroup()
+                                .add(jButton1)
+                                .add(8, 8, 8)
+                                .add(zoomStepUI, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 26, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                .add(jButton2))
+                            .add(jButton3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 87, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(54, 54, 54)
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jButton8)
                             .add(jToggleButton1))
@@ -305,20 +313,16 @@ public class AudioUIDemo extends javax.swing.JFrame {
                 .add(myPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE)
                 .add(18, 25, Short.MAX_VALUE)
                 .add(audSlider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel1Layout.createSequentialGroup()
-                        .add(24, 24, 24)
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(zoomStepUI, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jLabel1)))
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(jButton1)
                             .add(currPos, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(jToggleButton1)
                             .add(jButton7)
-                            .add(filechooserBut))
+                            .add(filechooserBut)
+                            .add(readChannelField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(jLabel11))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
@@ -326,11 +330,14 @@ public class AudioUIDemo extends javax.swing.JFrame {
                                 .add(stopAudio))
                             .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                                 .add(jToggleButton3)
-                                .add(jButton8)
-                                .add(jButton2))))
+                                .add(jButton8))))
                     .add(jPanel1Layout.createSequentialGroup()
-                        .add(18, 18, 18)
-                        .add(jButton3)))
+                        .add(jButton3)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(jButton1)
+                            .add(jButton2)
+                            .add(zoomStepUI, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
 
@@ -505,7 +512,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
             // Get the file
             audFile = Utility.UI.getFile(myPanel, Utility.wavFileFilter);
             // Channel to read
-            myAudio.setChannelToRead(2); // read the first channel
+            myAudio.setChannelToRead(Integer.parseInt(readChannelField.getText())); // read the first channel
             // Attach the file
             myAudio.setAudioFile(audFile);
             // Suggest the type of display desired -- MUST call!
@@ -740,8 +747,8 @@ public class AudioUIDemo extends javax.swing.JFrame {
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -763,6 +770,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
     private javax.swing.JScrollPane myPanel;
     private javax.swing.JButton playAudio;
     private javax.swing.JTextField pres;
+    private javax.swing.JTextField readChannelField;
     private javax.swing.JButton stopAudio;
     private javax.swing.JTextField time;
     private javax.swing.JTextField zoomStepUI;
