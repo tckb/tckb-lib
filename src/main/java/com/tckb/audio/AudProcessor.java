@@ -64,13 +64,13 @@ public class AudProcessor {
         Double[] origDataSamples;
 
         double dur_secs = audio.getDurationInSeconds();
-        
+
         if (dur_secs >= (8 * 60)) {
-             mylogger.info("Duration exceeds the limit; using mulitcore data reader; expect high CPU usage!");
+            mylogger.info("Duration exceeds the limit; using mulitcore data reader; expect high CPU usage!");
             origDataSamples = audio.getAudioNormData_multicore(channel, (int) Math.round(dur_secs * 0.1));
 
         } else {
-             mylogger.info("Duration in the limit; using single core data reader");
+            mylogger.info("Duration in the limit; using single core data reader");
             origDataSamples = audio.getAudioNormData(channel); // get the first channel
         }
 
@@ -129,6 +129,7 @@ public class AudProcessor {
     }
 
     public WaveDisplay getWavePanel() throws InvalidChannnelException {
+
         this.wvParams = new WvParams();
 
         int redSize = (wvParams.RED_SIZE_SAMPLE) / renderFactor;
@@ -138,10 +139,19 @@ public class AudProcessor {
         }
         wvParams.RED_SIZE_SAMPLE = redSize;
         calcWvParams();
+        mylogger.info("Rendering...");
 
         WaveDisplay wavePanel = new WaveDisplay(this.wvParams);
         wavePanel.setZoomLevel(wavePanel.getMinZoom());
-        wavePanel.setDisplayInfo(audio.getFile().getName()+" / Channel: "+channel);
+        wavePanel.setDisplayInfo(audio.getFile().getName() + " / Channel: " + channel);
+        
+        
+        
+        // BugFix: High memory usuage! peform garbage collection!
+        System.gc();
+        
+        
+        
         return wavePanel;
     }
 
