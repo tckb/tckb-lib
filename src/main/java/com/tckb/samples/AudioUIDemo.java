@@ -46,12 +46,17 @@ public class AudioUIDemo extends javax.swing.JFrame {
         // Intialize the UI componenets
         initComponents();
 
-        // Setup the optional UI components for UI interactivity
-        // Initial UI setup
-        myAudio.setDisplayContainer(myPanel);
-        myAudio.setUIPlay(playAudio);
-        myAudio.setUIPause(stopAudio);
-        myAudio.setUISeeker(audSlider);
+// Setup the optional UI components for UI interactivity
+// Initial UI setup
+// Deprecated code!
+//        myAudio.setDisplayContainer(myPanel);
+//        myAudio.setUIPlay(playAudio);
+//        myAudio.setUIPause(stopAudio);
+//        myAudio.setUISeeker(audSlider);
+        myAudio.attachUIComponent(AudioUI.UIComponent.CONTAINER, myPanel);
+        myAudio.attachUIComponent(AudioUI.UIComponent.PLAY, playAudio);
+        myAudio.attachUIComponent(AudioUI.UIComponent.PAUSE, stopAudio);
+        myAudio.attachUIComponent(AudioUI.UIComponent.SEEKER, audSlider);
 
     }
 
@@ -86,6 +91,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
         jButton8 = new javax.swing.JButton();
         readChannelField = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
+        jToggleButton5 = new javax.swing.JToggleButton();
         jButton4 = new javax.swing.JButton();
         label = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -263,6 +269,13 @@ public class AudioUIDemo extends javax.swing.JFrame {
 
         jLabel11.setText("Channel");
 
+        jToggleButton5.setText("Mute");
+        jToggleButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton5ActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -283,8 +296,10 @@ public class AudioUIDemo extends javax.swing.JFrame {
                             .add(jPanel1Layout.createSequentialGroup()
                                 .add(playAudio)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(stopAudio)))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .add(stopAudio)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jToggleButton5)))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 71, Short.MAX_VALUE)
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                             .add(jPanel1Layout.createSequentialGroup()
                                 .add(jButton1)
@@ -327,7 +342,8 @@ public class AudioUIDemo extends javax.swing.JFrame {
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                                 .add(playAudio)
-                                .add(stopAudio))
+                                .add(stopAudio)
+                                .add(jToggleButton5))
                             .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                                 .add(jToggleButton3)
                                 .add(jButton8))))
@@ -469,7 +485,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
                         .add(pres, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jLabel6)))
-                .addContainerGap(136, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 739, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -688,6 +704,11 @@ public class AudioUIDemo extends javax.swing.JFrame {
         aboutFrame.setVisible(true);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
+    private void jToggleButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton5ActionPerformed
+        myAudio.toggleMute();
+
+    }//GEN-LAST:event_jToggleButton5ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -766,6 +787,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
     private javax.swing.JToggleButton jToggleButton2;
     private javax.swing.JToggleButton jToggleButton3;
     private javax.swing.JToggleButton jToggleButton4;
+    private javax.swing.JToggleButton jToggleButton5;
     private javax.swing.JTextField label;
     private javax.swing.JScrollPane myPanel;
     private javax.swing.JButton playAudio;

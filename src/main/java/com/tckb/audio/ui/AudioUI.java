@@ -19,6 +19,7 @@ import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -35,41 +36,130 @@ public class AudioUI extends Observable {
     private boolean manualSeek = false;
     private int targetChannel = 1;
 
+    public static enum UIComponent {
+
+        PLAY, PAUSE, STOP, SEEKER, CONTAINER;
+    }
+
     public AudioUI() {
         defaultObserver = new SourceObserver();
         addObserver(defaultObserver);
     }
 
-    public void setAudioFile(File src) {
+    public boolean setAudioFile(File src) {
 
-        setChanged();
-        this.notifyObservers(src);
+        if (src.exists()) {
+            setChanged();
+            this.notifyObservers(src);
+            return true;
+        } else {
+            mylogger.log(Level.SEVERE, "Error: Can not set set file; {0} does not exist! ", src.getAbsolutePath());
+            return false;
+        }
 
+    }
+
+    public void attachUIComponent(UIComponent typeUIComponent, JComponent component) {
+        switch (typeUIComponent) {
+            case PLAY:
+
+                if (component instanceof JButton) {
+                    setUIPlay((JButton) component);
+                } else {
+                    mylogger.severe("Invalid component! expecting JButton; setting PLAY button failed!");
+                }
+
+                break;
+            case PAUSE:
+
+                if (component instanceof JButton) {
+                    setUIPause((JButton) component);
+                } else {
+                    mylogger.severe("Invalid component! expecting JButton; setting PAUSE button failed!");
+                }
+                break;
+            case STOP:
+
+                throw new UnsupportedOperationException("Not implemented!");
+
+//                if (component instanceof JButton) {
+//                    setUIStop((JButton) component);
+//                } else {
+//                    mylogger.severe("Invalid component! expecting JButton; setting STOP button failed!");
+//                }
+//                break;
+            case SEEKER:
+
+                if (component instanceof JSlider) {
+                    setUISeeker((JSlider) component);
+                }
+                if (component instanceof JProgressBar) {
+                    setUISeeker((JProgressBar) component);
+                } else {
+                    mylogger.severe("Invalid component! expecting JSlider / JProgressBar; setting SEEKER  failed!");
+                }
+                break;
+            case CONTAINER:
+                if (component instanceof JScrollPane) {
+
+                    setDisplayContainer((JScrollPane) component);
+                } else {
+                    mylogger.severe("Invalid component! expecting JScrollPane; setting CONTAINER failed!");
+                }
+                break;
+
+        }
+
+    }
+
+    public boolean toggleMute() {
+        return defaultObserver.toggleSound();
     }
 
     public void setAutoPlay(boolean b) {
         defaultObserver.setAutoPlay(b);
     }
 
+    /**
+     * @deprecated Use attachUIComponent
+     *
+     * @param aud_pause_but
+     */
     public void setUIPause(JButton aud_pause_but) {
 
         defaultObserver.addUIPause(aud_pause_but);
     }
 
+    /**
+     * @param aud_play_but
+     * @deprecated Use attachUIComponent
+     */
     public void setUIPlay(JButton aud_play_but) {
 
         defaultObserver.addUIPlay(aud_play_but);
     }
 
+    /**
+     * @param aud_seeker_slid
+     * @deprecated Use attachUIComponent
+     */
     public void setUISeeker(JSlider aud_seeker_slid) {
 
         defaultObserver.addSeeker(aud_seeker_slid);
     }
 
+    /**
+     * @param aud_seeker_slid
+     * @deprecated Use attachUIComponent
+     */
     public void setUISeeker(JProgressBar aud_seeker_slid) {
         defaultObserver.addSeeker(aud_seeker_slid);
     }
 
+    /**
+     * @param aContainer
+     * @deprecated Use attachUIComponent
+     */
     public void setDisplayContainer(JScrollPane aContainer) {
         defaultObserver.addContainer(aContainer);
     }
@@ -397,6 +487,18 @@ public class AudioUI extends Observable {
                     throw new IllegalAccessError("Display type not available");
 
             }
+        }
+
+        private boolean toggleSound() {
+
+            if (audio.isMute()) {
+                audio.setMute(false);
+                return false;
+            } else {
+                audio.setMute(true);
+                return true;
+            }
+
         }
     }
 }

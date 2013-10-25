@@ -23,7 +23,9 @@ import java.util.logging.Logger;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -54,6 +56,9 @@ public class NonTrivialAudio implements Runnable {
     private long bytesLeft;
     private byte[] empty32kBuffer;
     private byte[] empty64kBuffer; // 64k is arbitrary
+    private boolean isSoundMute = false;
+    private FloatControl audioLineGainControl;
+    private FloatControl audioLineVolControl;
 
     public static enum CHUNK_SIZE {
         // size32k was optimal from empherical tests
@@ -435,6 +440,11 @@ public class NonTrivialAudio implements Runnable {
                         = new DataLine.Info(SourceDataLine.class, format);
 
                 audioLine = (SourceDataLine) AudioSystem.getLine(info);
+                audioLine.open(format);
+
+                audioLineGainControl = ((FloatControl) audioLine.getControl(FloatControl.Type.MASTER_GAIN));
+                audioLineVolControl = ((FloatControl) audioLine.getControl(FloatControl.Type.VOLUME));
+
                 mylogger.fine("Opening audio line");
                 audioLine.open();
 
@@ -692,9 +702,8 @@ public class NonTrivialAudio implements Runnable {
     }
 
     /**
-     * 
-     * Experimental!
-     * Consumes a lot of heap!
+     *
+     * Experimental! Consumes a lot of heap!
      *
      * @param channel
      * @param chunk_dur_secs 0 to pickup default
@@ -773,6 +782,42 @@ public class NonTrivialAudio implements Runnable {
     public String toString() {
         return header.toString();
 
+    }
+
+    public void setMute(boolean state) {
+        if (state) {
+            audioLineGainControl.setValue(audioLineGainControl.getMinimum());
+
+        } else {
+            audioLineGainControl.setValue(audioLineGainControl.getMaximum());
+        }
+
+        this.isSoundMute = state;
+
+    }
+
+    /**
+     * Accepts 0.0 to 1.0
+     *
+     * @param level
+     */
+    public void setVolumeLevel(float level) {
+
+        if (level < 0) {
+            level = 0;
+        }
+        if (level > 1) {
+            level = 1;
+        }
+
+        float totalRange = audioLineGainControl.getMaximum() - audioLineGainControl.getMinimum();
+        float volLevel = audioLineGainControl.getMinimum() + level * totalRange;
+        audioLineGainControl.setValue(volLevel);
+
+    }
+
+    public boolean isMute() {
+        return isSoundMute;
     }
 
     public class InvalidChannnelException extends Exception {
