@@ -112,10 +112,23 @@ public class AudioUI extends Observable {
 
     }
 
+    // experimental! doesnt work
+    private void setVolume(float level) {
+        defaultObserver.setVolLevel(level);
+    }
+
     public boolean toggleMute() {
         return defaultObserver.toggleSound();
     }
 
+    public void setAudioMute(boolean state) {
+       defaultObserver.setAudioMute(state);
+    }
+
+    public boolean isMuted(){
+        return defaultObserver.getMuteStatus();
+    }
+    
     public void setAutoPlay(boolean b) {
         defaultObserver.setAutoPlay(b);
     }
@@ -490,7 +503,6 @@ public class AudioUI extends Observable {
         }
 
         private boolean toggleSound() {
-
             if (audio.isMute()) {
                 audio.setMute(false);
                 return false;
@@ -499,6 +511,19 @@ public class AudioUI extends Observable {
                 return true;
             }
 
+        }
+
+        private void setAudioMute(boolean state) {
+            audio.setMute(state);
+
+        }
+
+        private void setVolLevel(float level) {
+            audio.setVolumeLevel(level);
+        }
+
+        private boolean getMuteStatus() {
+            return audio.isMute();
         }
     }
 }

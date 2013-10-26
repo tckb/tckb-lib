@@ -441,9 +441,8 @@ public class NonTrivialAudio implements Runnable {
 
                 audioLine = (SourceDataLine) AudioSystem.getLine(info);
                 audioLine.open(format);
-
                 audioLineGainControl = ((FloatControl) audioLine.getControl(FloatControl.Type.MASTER_GAIN));
-                audioLineVolControl = ((FloatControl) audioLine.getControl(FloatControl.Type.VOLUME));
+                audioLineGainControl.setValue(audioLineGainControl.getMaximum());
 
                 mylogger.fine("Opening audio line");
                 audioLine.open();
@@ -797,12 +796,13 @@ public class NonTrivialAudio implements Runnable {
     }
 
     /**
-     * Accepts 0.0 to 1.0
+     * Experimental! Accepts 0.0 to 1.0
      *
      * @param level
      */
     public void setVolumeLevel(float level) {
 
+        mylogger.log(Level.INFO, "Setting volume level: {0}", level);
         if (level < 0) {
             level = 0;
         }
@@ -811,8 +811,15 @@ public class NonTrivialAudio implements Runnable {
         }
 
         float totalRange = audioLineGainControl.getMaximum() - audioLineGainControl.getMinimum();
-        float volLevel = audioLineGainControl.getMinimum() + level * totalRange;
+        float volLevel = audioLineGainControl.getMinimum() + (level * totalRange);
+        System.out.println("totalr: " + totalRange);
+        System.out.println("volr: " + volLevel);
+
         audioLineGainControl.setValue(volLevel);
+
+    }
+
+    public void getVolumeLevel() {
 
     }
 
