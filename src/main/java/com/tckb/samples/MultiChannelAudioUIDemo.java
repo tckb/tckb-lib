@@ -34,24 +34,30 @@ public class MultiChannelAudioUIDemo extends javax.swing.JFrame {
      * Creates new form MultiChannelAudioUIDemo
      */
     public MultiChannelAudioUIDemo() {
-        ch1ui = new AudioUI();
-        ch2ui = new AudioUI();
 
+        
+        // gui init
         initComponents();
-
+        
+        // intial setup for audioui-1
+        ch1ui = new AudioUI();
         ch1ui.attachUIComponent(AudioUI.UIComponent.CONTAINER, ch1Panel);
+        ch1ui.setChannelToRead(1); // read channel 1
+        
+        // intial setup for audioui-2
+        ch2ui = new AudioUI();
         ch2ui.attachUIComponent(AudioUI.UIComponent.CONTAINER, ch2Panel);
+        ch2ui.setChannelToRead(2); // read channel 2
 
-        ch1ui.setChannelToRead(1);
-        ch2ui.setChannelToRead(2);
-
-        mui.attachUIComponent(MultiChannelAudioUI.UIComponent.PLAY, jButton1);
-        mui.attachUIComponent(MultiChannelAudioUI.UIComponent.PAUSE, jButton2);
+        // configure multichannel ui
+        mui.attachUIComponent(MultiChannelAudioUI.UIComponent.PLAY, playButton);
+        mui.attachUIComponent(MultiChannelAudioUI.UIComponent.PAUSE, pauseButton);
         mui.attachUIComponent(MultiChannelAudioUI.UIComponent.SEEKER, jProgressBar1);
-
+        
+        // add audio uis
         mui.addTrack(ch1ui, AudioDisplay.TYPE.WAVEFORM);
         mui.addTrack(ch2ui, AudioDisplay.TYPE.WAVEFORM);
-
+        
     }
 
     /**
@@ -63,14 +69,14 @@ public class MultiChannelAudioUIDemo extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        playButton = new javax.swing.JButton();
+        pauseButton = new javax.swing.JButton();
         jProgressBar1 = new javax.swing.JProgressBar();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
-        jButton7 = new javax.swing.JButton();
+        audiFileButton = new javax.swing.JButton();
+        ch1ZIn = new javax.swing.JButton();
+        ch1Zout = new javax.swing.JButton();
+        ch2ZIn = new javax.swing.JButton();
+        ch2Zout = new javax.swing.JButton();
         jCheckBox1 = new javax.swing.JCheckBox();
         jCheckBox2 = new javax.swing.JCheckBox();
         zstep = new javax.swing.JTextField();
@@ -81,42 +87,42 @@ public class MultiChannelAudioUIDemo extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jButton1.setText("play");
+        playButton.setText("play");
 
-        jButton2.setText("pause");
+        pauseButton.setText("pause");
 
-        jButton3.setText("aud file");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        audiFileButton.setText("open file");
+        audiFileButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                audiFileButtonActionPerformed(evt);
             }
         });
 
-        jButton4.setText("+");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        ch1ZIn.setText("+");
+        ch1ZIn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                ch1ZInActionPerformed(evt);
             }
         });
 
-        jButton5.setText("-");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
+        ch1Zout.setText("-");
+        ch1Zout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
+                ch1ZoutActionPerformed(evt);
             }
         });
 
-        jButton6.setText("+");
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
+        ch2ZIn.setText("+");
+        ch2ZIn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
+                ch2ZInActionPerformed(evt);
             }
         });
 
-        jButton7.setText("-");
-        jButton7.addActionListener(new java.awt.event.ActionListener() {
+        ch2Zout.setText("-");
+        ch2Zout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton7ActionPerformed(evt);
+                ch2ZoutActionPerformed(evt);
             }
         });
 
@@ -141,7 +147,7 @@ public class MultiChannelAudioUIDemo extends javax.swing.JFrame {
 
         jLabel1.setText("secs");
 
-        jSplitPane1.setDividerLocation(5);
+        jSplitPane1.setDividerLocation(600);
         jSplitPane1.setLeftComponent(ch1Panel);
         jSplitPane1.setRightComponent(ch2Panel);
 
@@ -156,16 +162,16 @@ public class MultiChannelAudioUIDemo extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton1)
+                                .addComponent(playButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton2)
+                                .addComponent(pauseButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton3)
-                                .addGap(327, 366, Short.MAX_VALUE))
+                                .addComponent(audiFileButton)
+                                .addGap(327, 362, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(ch1ZIn, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(ch1Zout, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jCheckBox1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -173,12 +179,12 @@ public class MultiChannelAudioUIDemo extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel1)
                                 .addGap(49, 49, 49)))
-                        .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(ch2ZIn, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(ch2Zout, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jCheckBox2)
-                        .addGap(0, 370, Short.MAX_VALUE))
+                        .addGap(0, 366, Short.MAX_VALUE))
                     .addComponent(jSplitPane1))
                 .addContainerGap())
         );
@@ -189,10 +195,10 @@ public class MultiChannelAudioUIDemo extends javax.swing.JFrame {
                 .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton4)
-                    .addComponent(jButton5)
-                    .addComponent(jButton6)
-                    .addComponent(jButton7)
+                    .addComponent(ch1ZIn)
+                    .addComponent(ch1Zout)
+                    .addComponent(ch2ZIn)
+                    .addComponent(ch2Zout)
                     .addComponent(jCheckBox1)
                     .addComponent(jCheckBox2)
                     .addComponent(zstep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -201,44 +207,44 @@ public class MultiChannelAudioUIDemo extends javax.swing.JFrame {
                 .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3))
+                    .addComponent(playButton)
+                    .addComponent(pauseButton)
+                    .addComponent(audiFileButton))
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void audiFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_audiFileButtonActionPerformed
 
         mui.setAudioFile(Utility.UI.getFile(rootPane));
         
         jCheckBox1.setSelected(ch1ui.isMuted());
         jCheckBox2.setSelected(ch2ui.isMuted());
 
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_audiFileButtonActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void ch1ZInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ch1ZInActionPerformed
         ch1ui.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomStep(Integer.parseInt(zstep.getText()));
         ch1ui.getDisplay(AudioDisplay.TYPE.WAVEFORM).zoomIn();
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_ch1ZInActionPerformed
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    private void ch1ZoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ch1ZoutActionPerformed
         ch1ui.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomStep(Integer.parseInt(zstep.getText()));
 
         ch1ui.getDisplay(AudioDisplay.TYPE.WAVEFORM).zoomOut();
-    }//GEN-LAST:event_jButton5ActionPerformed
+    }//GEN-LAST:event_ch1ZoutActionPerformed
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+    private void ch2ZInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ch2ZInActionPerformed
         ch2ui.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomStep(Integer.parseInt(zstep.getText()));
         ch2ui.getDisplay(AudioDisplay.TYPE.WAVEFORM).zoomIn();
-    }//GEN-LAST:event_jButton6ActionPerformed
+    }//GEN-LAST:event_ch2ZInActionPerformed
 
-    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+    private void ch2ZoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ch2ZoutActionPerformed
         ch2ui.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomStep(Integer.parseInt(zstep.getText()));
         ch2ui.getDisplay(AudioDisplay.TYPE.WAVEFORM).zoomOut();
-    }//GEN-LAST:event_jButton7ActionPerformed
+    }//GEN-LAST:event_ch2ZoutActionPerformed
 
     private void jCheckBox1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jCheckBox1StateChanged
 
@@ -292,20 +298,20 @@ public class MultiChannelAudioUIDemo extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton audiFileButton;
     private javax.swing.JScrollPane ch1Panel;
+    private javax.swing.JButton ch1ZIn;
+    private javax.swing.JButton ch1Zout;
     private javax.swing.JScrollPane ch2Panel;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
+    private javax.swing.JButton ch2ZIn;
+    private javax.swing.JButton ch2Zout;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JButton pauseButton;
+    private javax.swing.JButton playButton;
     private javax.swing.JTextField zstep;
     // End of variables declaration//GEN-END:variables
 }

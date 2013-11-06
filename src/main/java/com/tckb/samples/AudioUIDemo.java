@@ -48,11 +48,13 @@ public class AudioUIDemo extends javax.swing.JFrame {
 
 // Setup the optional UI components for UI interactivity
 // Initial UI setup
+        
 // Deprecated code!
 //        myAudio.setDisplayContainer(myPanel);
 //        myAudio.setUIPlay(playAudio);
 //        myAudio.setUIPause(stopAudio);
 //        myAudio.setUISeeker(audSlider);
+        
         myAudio.attachUIComponent(AudioUI.UIComponent.CONTAINER, myPanel);
         myAudio.attachUIComponent(AudioUI.UIComponent.PLAY, playAudio);
         myAudio.attachUIComponent(AudioUI.UIComponent.PAUSE, stopAudio);
@@ -533,7 +535,7 @@ public class AudioUIDemo extends javax.swing.JFrame {
             myAudio.setAudioFile(audFile);
             // Suggest the type of display desired -- MUST call!
             // Must be called after the intial UI setup
-            myAudio.setContainerDisplay(AudioDisplay.TYPE.WAVEFORM);
+                myAudio.setContainerDisplay(AudioDisplay.TYPE.WAVEFORM);
             // setup the display 
             myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setCrosshairLen(10);
             myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomLevel(myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).getMinZoom());

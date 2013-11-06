@@ -5,6 +5,7 @@
 package com.tckb.audio.ui;
 
 import com.tckb.audio.AudProcessor;
+import com.tckb.audio.AudioHeader;
 import com.tckb.audio.NonTrivialAudio;
 import com.tckb.audio.ui.display.AudioDisplay;
 import com.tckb.audio.ui.display.AudioDisplay.TYPE;
@@ -59,6 +60,11 @@ public class AudioUI extends Observable {
 
     }
 
+    
+   public AudioHeader getHeader(){
+       return null;
+   }
+    
     public void attachUIComponent(UIComponent typeUIComponent, JComponent component) {
         switch (typeUIComponent) {
             case PLAY:
