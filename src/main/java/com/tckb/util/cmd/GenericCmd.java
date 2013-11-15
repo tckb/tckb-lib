@@ -68,7 +68,6 @@ public class GenericCmd implements Runnable {
 
             if (!inputs.isEmpty() && OFmt != null && OFname != null) {
 
-
                 // Add Inputs
                 for (Entry e : inputs.entrySet()) {
                     flagList.add("-" + e.getKey());
@@ -87,14 +86,12 @@ public class GenericCmd implements Runnable {
             processb.redirectErrorStream(true);
             Process cmdProcess = processb.start();
 
-
             myLog.writeln("Output:");
             BufferedReader br = new BufferedReader(new InputStreamReader(cmdProcess.getInputStream()));
 
             while ((tmp = br.readLine()) != null) {
                 myLog.writeln(tmp);
             }
-
 
             int returnVal = cmdProcess.waitFor();
             myLog.writeln("Command executed with return value: " + returnVal);
@@ -123,15 +120,12 @@ public class GenericCmd implements Runnable {
             flagList.add(cmd);
             if (!inputs.isEmpty() && OFmt != null && OFname != null) {
 
-
                 // Inputs
                 for (Entry e : inputs.entrySet()) {
                     flags += "-" + e.getKey() + " " + e.getValue() + " ";
 
                     flagList.add("-" + e.getKey());
                     flagList.add((String) e.getValue());
-
-
 
                 }
                 // outputs
@@ -157,14 +151,12 @@ public class GenericCmd implements Runnable {
 
             System.out.println("Executing this command: " + tmpBatchFile.getAbsolutePath());
 
-
             BufferedReader br = new BufferedReader(new InputStreamReader(cmdProcess.getErrorStream()));
             while ((tmp = br.readLine()) != null) // logText += br.readLine();
             {
                 myLog.writeln(tmp);
 
             }
-
 
             System.out.println("Output:");
             br = new BufferedReader(new InputStreamReader(cmdProcess.getInputStream()));
@@ -174,26 +166,14 @@ public class GenericCmd implements Runnable {
                 myLog.writeln(tmp);
             }
 
-
-
             // Now load the tmpLogFile to the log file
-
             myLog.loadFromFile(tmpLogFile);
-
-
-
 
             int returnVal = cmdProcess.waitFor();
             myLog.writeln("Command executed with return value: " + returnVal);
             myLog.writeln("==============================================");
 
-
-
-
             //  System.out.println("Command executed succesfully: " + cmdProcess.waitFor());
-
-
-
         } catch (IOException ex) {
             myLog.writeln("Error: " + ex.getMessage());
         } catch (InterruptedException ex) {
@@ -239,7 +219,6 @@ public class GenericCmd implements Runnable {
 
     public String getOuputLog() throws Exception {
 
-
         if (logText != null) {
             return logText;
         } else {
@@ -250,7 +229,6 @@ public class GenericCmd implements Runnable {
     @Override
     public String toString() {
         return "[" + this.getName() + ":" + flagList + "]";
-
 
     }
 
@@ -280,16 +258,16 @@ public class GenericCmd implements Runnable {
 
     public class GenericCmdLog extends Observable {
 
-        private String text = "";
-        private String name;
-        private boolean isTextReady = false;
+        protected String text = "";
+        protected String name;
+        protected boolean isTextReady = false;
 
         public GenericCmdLog(String name) {
             this.name = name + "-log";
             writeln("LogStarted: " + Calendar.getInstance().getTime());
         }
 
-           public final void writeln(String log) {
+        public final void writeln(String log) {
             text += "\n[" + this.name + "]" + log;
         }
 
@@ -301,7 +279,6 @@ public class GenericCmd implements Runnable {
         public void done() {
             setChanged();
             notifyObservers(this.text);
-
 
         }
 
@@ -317,7 +294,6 @@ public class GenericCmd implements Runnable {
                 while ((str = br.readLine()) != null) {
                     this.writeln(str);
                 }
-
 
             } catch (Exception ex) {
                 Logger.getLogger(GenericCmd.class.getName()).log(Level.SEVERE, null, ex);

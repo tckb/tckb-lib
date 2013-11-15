@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Observer;
 
 /**
  *
@@ -20,23 +21,23 @@ import java.util.Map;
 public class GenericCmdv2 extends GenericCmd {
 
     private final LinkedHashMap<String, String> flags = new LinkedHashMap<String, String>();
+    GenericCmdLogV2 myLog = null;
 
     public GenericCmdv2() {
         super("command");
-
 
     }
 
     public GenericCmdv2(String name) {
         super(name);
-
+        myLog = new GenericCmdLogV2(getName());
     }
 
     /**
      * Adds a flag ( -flag value ) to the command
-     *  
+     *
      * @param flag - accepts NULL value
-     * @param value 
+     * @param value
      */
     public void addFlag(String flag, String value) {
         if (!flag.isEmpty()) {
@@ -49,6 +50,12 @@ public class GenericCmdv2 extends GenericCmd {
 
     }
 
+    
+    public void attachObserver(Observer testPMObserver) {
+        myLog.addObserver(testPMObserver);
+
+    }
+
     @Override
     protected void runNormal() {
         myLog.writeln("==============================================");
@@ -58,23 +65,21 @@ public class GenericCmdv2 extends GenericCmd {
             // Add  main command
             flagList.add(cmd);
 
-
             addToFlagList(flags);
-          myLog.writeln("Executing command: " + flagList);
+            myLog.writeln("Executing command: " + flagList);
             ProcessBuilder processb = new ProcessBuilder(flagList);
 
             // merge error & output 
             processb.redirectErrorStream(true);
             Process cmdProcess = processb.start();
 
-
             myLog.writeln("Output:");
             BufferedReader br = new BufferedReader(new InputStreamReader(cmdProcess.getInputStream()));
 
             while ((tmp = br.readLine()) != null) {
                 myLog.writeln(tmp);
+                myLog.writeRaw(tmp);
             }
-
 
             int returnVal = cmdProcess.waitFor();
             myLog.writeln("Command executed with return value: " + returnVal);
@@ -125,14 +130,12 @@ public class GenericCmdv2 extends GenericCmd {
 
             System.out.println("Executing this command: " + tmpBatchFile.getAbsolutePath());
 
-
             BufferedReader br = new BufferedReader(new InputStreamReader(cmdProcess.getErrorStream()));
             while ((tmp = br.readLine()) != null) // logText += br.readLine();
             {
                 myLog.writeln(tmp);
 
             }
-
 
             System.out.println("Output:");
             br = new BufferedReader(new InputStreamReader(cmdProcess.getInputStream()));
@@ -142,26 +145,14 @@ public class GenericCmdv2 extends GenericCmd {
                 myLog.writeln(tmp);
             }
 
-
-
             // Now load the tmpLogFile to the log file
-
             myLog.loadFromFile(tmpLogFile);
-
-
-
 
             int returnVal = cmdProcess.waitFor();
             myLog.writeln("Command executed with return value: " + returnVal);
             myLog.writeln("==============================================");
 
-
-
-
             //  System.out.println("Command executed succesfully: " + cmdProcess.waitFor());
-
-
-
         } catch (IOException ex) {
             myLog.writeln("Error: " + ex.getMessage());
         } catch (InterruptedException ex) {
@@ -176,23 +167,45 @@ public class GenericCmdv2 extends GenericCmd {
     private void addToFlagList(HashMap<String, String> flags) {
         if (!flags.isEmpty()) {
 
-
             // Add flags
             for (Map.Entry e : flags.entrySet()) {
 
                 if (!((String) e.getKey()).startsWith("_$")) {
                     flagList.add("-" + e.getKey());
                     flagList.add((String) e.getValue());
-                }else{
+                } else {
                     flagList.add((String) e.getValue());
                 }
-
 
             }
 
         }
 
     }
+
+    public class GenericCmdLogV2 extends GenericCmd.GenericCmdLog {
+
+        public StringBuilder rawOutput;
+
+        public GenericCmdLogV2(String name) {
+            super(name);
+            rawOutput = new StringBuilder().append("\n");
+        }
+
+        public void writeRaw(String string) {
+            rawOutput.append(string).append("\n");
+        }
+
+        @Override
+        public void done() {
+            setChanged();
+            notifyObservers(rawOutput);
+            setChanged();
+            notifyObservers(text);
+
+        }
+    }
+
 }
 // -DEAD CODE-
 // if (!inputs.isEmpty() && OFmt != null && OFname != null) {

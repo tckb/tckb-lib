@@ -26,13 +26,14 @@ public class GenericCmdLogObserver implements Observer {
     private String out = null;
     private boolean uiNotify;
     // --Deprecated block--
-    private ArrayList<String> old_classNames = new ArrayList<String>();
-    private ArrayList<String> old_methodNames = new ArrayList<String>();
+    private final ArrayList<String> old_classNames = new ArrayList<String>();
+    private final ArrayList<String> old_methodNames = new ArrayList<String>();
     private Object callBackObject = null;
     // --Deprecated block--
-    private LinkedList<String> classNames = new LinkedList<String>();
-    private LinkedList<String> methodNames = new LinkedList<String>();
-    private LinkedList<Object[]> callBackMethodParams = new LinkedList<Object[]>();
+    private final LinkedList<String> classNames = new LinkedList<String>();
+    private final LinkedList<String> methodNames = new LinkedList<String>();
+    private final LinkedList<Object[]> callBackMethodParams = new LinkedList<Object[]>();
+    private boolean outNotAvailable = true;
 
     /**
      * At least one out should be attached to receive UI notification An output
@@ -56,17 +57,19 @@ public class GenericCmdLogObserver implements Observer {
             System.err.println(obj.getClass() + ": Unknown Out! Cannot attach.");
         }
 
-
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        System.out.println(this.getClass().getName() + ": Update received from::" + o.getClass().getSimpleName());
 
         // Saves the log to the out's
-
         if (arg instanceof String) {
 
+            
+            
+            
+            
+            
             String text = (String) arg;
 
             if (outStream != null) {
@@ -78,10 +81,8 @@ public class GenericCmdLogObserver implements Observer {
             if (outTxArea != null) {
                 outTxArea.append(text);
             }
-            if (out != null) {
-                out = text;
-            }
 
+            out = text;
 
             if (uiNotify) {
 
@@ -98,10 +99,6 @@ public class GenericCmdLogObserver implements Observer {
 
             }
 
-
-
-
-
             while (!classNames.isEmpty()) {
 
                 String className = classNames.poll();
@@ -116,10 +113,7 @@ public class GenericCmdLogObserver implements Observer {
                         cbMClass[i] = currCallBackMethodParams[i].getClass();
                     }
 
-
-
                     Class.forName(className).getMethod(mName, cbMClass).invoke(objInst, currCallBackMethodParams);
-
 
                 } catch (Exception ex) {
 
@@ -127,18 +121,10 @@ public class GenericCmdLogObserver implements Observer {
 
                 }
 
-
-
-
             }
 
-
-
             // --- deprecated block       
-
-
             // Generic class-Method calls
-
             if (callBackObject != null) {
                 for (String clas : old_classNames) {
                     try {
@@ -146,7 +132,6 @@ public class GenericCmdLogObserver implements Observer {
                         String mName = old_methodNames.get(old_classNames.indexOf(clas));
 
                         Class.forName(clas).getMethod(mName).invoke(callBackObject);
-
 
                     } catch (Exception ex) {
 
@@ -162,7 +147,6 @@ public class GenericCmdLogObserver implements Observer {
                         String mName = old_methodNames.get(old_classNames.indexOf(clas));
                         Class.forName(clas).getMethod(mName).invoke(objInst);
 
-
                     } catch (Exception ex) {
 
                         System.out.println("Exception in class: " + clas + ":" + ex.getLocalizedMessage());
@@ -171,13 +155,26 @@ public class GenericCmdLogObserver implements Observer {
                 }
             }
 
-
-
             // --- deprecated block       
-
-
-
+            outNotAvailable = false;
         }
+
+    }
+
+    /**
+     * Blocks the current thread until the output is available returns the log
+     * as string
+     *
+     * @return output log
+     * @throws InterruptedException
+     */
+    public String waitForOutput() throws InterruptedException {
+        while (outNotAvailable) {
+
+            Thread.sleep(100);
+        }
+
+        return out;
     }
 
     /**

@@ -5,6 +5,7 @@
 package com.tckb.sandbox;
 
 import com.tckb.util.cmd.GenericCmdLogObserver;
+import com.tckb.util.cmd.GenericCmdOutputObserver;
 import com.tckb.util.cmd.GenericCmdv2;
 import java.util.Observable;
 import java.util.logging.Level;
@@ -18,29 +19,31 @@ public class GenericCmdExample extends Observable {
 
     public static void main(String[] args) {
         try {
-
-//            GenericCmd testPM = new GenericCmd("notepad");
-//            testPM.enableDefaultObserver();
-//
-//            //testPM.attachLogObserver(testPMObserver); 
-//            // Same as testPM.getLogger().addObserver(testPMObserver)
-//            testPM.setCommand("notepad");
-//            testPM.runCommand();
-//            
+         
             GenericCmdv2 testPM2 = new GenericCmdv2("java-run");
-
-            GenericCmdLogObserver defaultObserver = testPM2.enableDefaultObserver();
-            defaultObserver.attachMethodCallWithParams(GenericCmdExample.class.getName(), "sayHello");
-            defaultObserver.attachMethodCallWithParams(GenericCmdExample.class.getName(), "eat", new Integer(10), new Double(5.55), "croissant");
-            defaultObserver.attachMethodCall(GenericCmdExample.class.getName(), "sayGoodBye");
-            defaultObserver.enableUINotification();
-
-            // defaultObserver.attachMethodCallWithParams(main.class.getName(), "test");
             testPM2.setCommand("java");
             testPM2.addFlag("version", "");
+            GenericCmdOutputObserver rawOutputObserver = new GenericCmdOutputObserver();
+            GenericCmdLogObserver cmdLogObserver = new GenericCmdLogObserver();
+            cmdLogObserver.attachMethodCallWithParams(GenericCmdExample.class.getName(), "sayHello");
+            cmdLogObserver.attachMethodCallWithParams(GenericCmdExample.class.getName(), "eat", new Integer(10), new Double(5.55), "croissant");
+            cmdLogObserver.attachMethodCall(GenericCmdExample.class.getName(), "sayGoodBye");
+            cmdLogObserver.enableUINotification();
+
+            testPM2.attachObserver(rawOutputObserver);
+            testPM2.attachObserver(cmdLogObserver);
             testPM2.runCommand(false);
 
-        } catch (Exception ex) {
+            String logOut = cmdLogObserver.waitForOutput();
+            String rawOut = rawOutputObserver.waitForOutput();
+
+            System.out.println("Here is raw output: ");
+            System.out.println(rawOut);
+
+            System.out.println("Here is log output: ");
+            System.out.println(logOut);
+
+        } catch (InterruptedException ex) {
             Logger.getLogger(GenericCmdExample.class.getName()).log(Level.SEVERE, null, ex);
         }
 
