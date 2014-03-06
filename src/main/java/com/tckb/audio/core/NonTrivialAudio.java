@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template rawDataStream the editor.
  */
-package com.tckb.audio;
+package com.tckb.audio.core;
 
 import com.tckb.borrowed.elan.WAVHeader;
 import com.tckb.util.Utility;
@@ -702,7 +702,7 @@ public class NonTrivialAudio implements Runnable {
 
     /**
      *
-     * Experimental! Consumes a lot of heap!
+     * 
      *
      * @param channel
      * @param chunk_dur_secs 0 to pickup default

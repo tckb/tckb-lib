@@ -16,7 +16,7 @@
  */
 package com.tckb.samples;
 
-import com.tckb.audio.NonTrivialAudio;
+import com.tckb.audio.core.NonTrivialAudio;
 import com.tckb.audio.ui.AudioUI;
 import com.tckb.audio.ui.display.AudioDisplay;
 import com.tckb.util.Utility;

@@ -16,7 +16,7 @@
  */
 package com.tckb.samples;
 
-import com.tckb.audio.NonTrivialAudio;
+import com.tckb.audio.core.NonTrivialAudio;
 import com.tckb.audio.part.Label;
 import com.tckb.audio.ui.AudioUI;
 import com.tckb.audio.ui.display.AudioDisplay;
@@ -537,11 +537,20 @@ public class AudioUIDemo extends javax.swing.JFrame {
             // Must be called after the intial UI setup
                 myAudio.setContainerDisplay(AudioDisplay.TYPE.WAVEFORM);
             // setup the display 
-            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setCrosshairLen(10);
-            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomLevel(myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).getMinZoom());
-            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).showCursor(false);
+                // redundant & deprecated and WILL be removed!
+//            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setCrosshairLen(10);
+//            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomLevel(myAudio.getDisplay().getMinZoom());
+//            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).showCursor(false);
             myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setTimePrecision(4);
-//            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setDisplayInfo("Audio UI Demo - ver0.1-alpha");
+            
+            myAudio.getDisplay().setCrosshairLen(10);
+            myAudio.getDisplay().setZoomLevel(myAudio.getDisplay().getMinZoom());
+            myAudio.getDisplay().showCursor(false);
+            
+            
+            
+            
+//            myAudio.getDisplay().setDisplayInfo("Audio UI Demo - ver0.1-alpha");
         } catch (NonTrivialAudio.InvalidChannnelException ex) {
             Logger.getLogger(AudioUIDemo.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -549,17 +558,17 @@ public class AudioUIDemo extends javax.swing.JFrame {
     }//GEN-LAST:event_filechooserButActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomStep(Integer.parseInt(zoomStepUI.getText()));
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).zoomIn();
+        myAudio.getDisplay().setZoomStep(Integer.parseInt(zoomStepUI.getText()));
+        myAudio.getDisplay().zoomIn();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomStep(Integer.parseInt(zoomStepUI.getText()));
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).zoomOut();
+        myAudio.getDisplay().setZoomStep(Integer.parseInt(zoomStepUI.getText()));
+        myAudio.getDisplay().zoomOut();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).resetZoom();
+        myAudio.getDisplay().resetZoom();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -569,11 +578,11 @@ public class AudioUIDemo extends javax.swing.JFrame {
         while (l < words.length - 1) {
             String lbl = words[l + 1];
             Double t = Double.parseDouble(words[l]);
-            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setLabelAt(lbl, t);
+            myAudio.getDisplay().setLabelAt(lbl, t);
             l += 2;
         }
 
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).refreshDisplay();
+        myAudio.getDisplay().refreshDisplay();
 
     }//GEN-LAST:event_jButton4ActionPerformed
 
@@ -583,8 +592,8 @@ public class AudioUIDemo extends javax.swing.JFrame {
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         if (!label.getText().isEmpty() && !time.getText().isEmpty()) {
-            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setLabelAt(label.getText(), Double.parseDouble(time.getText()));
-            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).refreshDisplay();
+            myAudio.getDisplay().setLabelAt(label.getText(), Double.parseDouble(time.getText()));
+            myAudio.getDisplay().refreshDisplay();
 
         }
 
@@ -593,16 +602,16 @@ public class AudioUIDemo extends javax.swing.JFrame {
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         if (!time.getText().isEmpty()) {
-            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).deleteLabelAt(Double.parseDouble(time.getText()));
-            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).refreshDisplay();
+            myAudio.getDisplay().deleteLabelAt(Double.parseDouble(time.getText()));
+            myAudio.getDisplay().refreshDisplay();
 
         }
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         if (!currPos.getText().isEmpty()) {
-            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setCursorPos(Double.parseDouble(currPos.getText()));
-            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).refreshDisplay();
+            myAudio.getDisplay().setCursorPos(Double.parseDouble(currPos.getText()));
+            myAudio.getDisplay().refreshDisplay();
 
         }
 
@@ -614,32 +623,32 @@ public class AudioUIDemo extends javax.swing.JFrame {
     }//GEN-LAST:event_stopAudioActionPerformed
 
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).toggleDisplay();
+        myAudio.getDisplay().toggleDisplay();
     }//GEN-LAST:event_jToggleButton1ActionPerformed
 
     private void jToggleButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton2ActionPerformed
-        System.out.println(myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).toggleLabels());
+        System.out.println(myAudio.getDisplay().toggleLabels());
 
     }//GEN-LAST:event_jToggleButton2ActionPerformed
 
     private void myPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_myPanelMouseClicked
 
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).showCursorAt(evt.getX(), evt.getY());
+        myAudio.getDisplay().showCursorAt(evt.getX(), evt.getY());
     }//GEN-LAST:event_myPanelMouseClicked
 
     private void myPanelMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_myPanelMouseDragged
 
-        Label l = myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).getLabelAtXY(evt.getX(), evt.getY());
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).showCursorAt(evt.getX(), evt.getY());
+        Label l = myAudio.getDisplay().getLabelAtXY(evt.getX(), evt.getY());
+        myAudio.getDisplay().showCursorAt(evt.getX(), evt.getY());
 
         if (l != null) {
-            myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setLabelAtXY(l, evt.getX(), evt.getY());
+            myAudio.getDisplay().setLabelAtXY(l, evt.getX(), evt.getY());
         }
 
     }//GEN-LAST:event_myPanelMouseDragged
 
     private void myPanelMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_myPanelMousePressed
-        l = myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).getLabelAtXY(evt.getX(), evt.getY());
+        l = myAudio.getDisplay().getLabelAtXY(evt.getX(), evt.getY());
 //        System.out.println(l.getText());
     }//GEN-LAST:event_myPanelMousePressed
 
@@ -647,35 +656,35 @@ public class AudioUIDemo extends javax.swing.JFrame {
     }//GEN-LAST:event_myPanelMouseReleased
 
     private void myPanelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_myPanelMouseEntered
-//        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).showCursor(true);
+//        myAudio.getDisplay().showCursor(true);
     }//GEN-LAST:event_myPanelMouseEntered
 
     private void myPanelMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_myPanelMouseExited
-//        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).showCursor(false);
+//        myAudio.getDisplay().showCursor(false);
     }//GEN-LAST:event_myPanelMouseExited
 
     private void jToggleButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton3ActionPerformed
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).showCursor(jToggleButton3.isSelected());
+        myAudio.getDisplay().showCursor(jToggleButton3.isSelected());
     }//GEN-LAST:event_jToggleButton3ActionPerformed
 
     private void jToggleButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton4ActionPerformed
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).editLabels(jToggleButton4.isSelected());
+        myAudio.getDisplay().editLabels(jToggleButton4.isSelected());
     }//GEN-LAST:event_jToggleButton4ActionPerformed
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).refreshDisplay();
+        myAudio.getDisplay().refreshDisplay();
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
 
         // Retrieve all the labels
-        ArrayList<Label> labelData = myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).getAllLabels();
+        ArrayList<Label> labelData = myAudio.getDisplay().getAllLabels();
         StringBuilder labels = new StringBuilder();
         labels.append("#####################").append(Utility.LINE_BREAK);
         labels.append("# Label / TimeStamp(sec)").append(Utility.LINE_BREAK);
         labels.append("######################").append(Utility.LINE_BREAK);
         for (Label l : labelData) {
-            labels.append(l.getTitle()).append(" / ").append(myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).getLabelTimeStamp(l.getPosAsSample())).append(Utility.LINE_BREAK);
+            labels.append(l.getTitle()).append(" / ").append(myAudio.getDisplay().getLabelTimeStamp(l.getPosAsSample())).append(Utility.LINE_BREAK);
         }
 
         labels.append("#####################").append(Utility.LINE_BREAK);
@@ -693,8 +702,8 @@ public class AudioUIDemo extends javax.swing.JFrame {
     }//GEN-LAST:event_presActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).setTimePrecision(Integer.parseInt(pres.getText()));
-        myAudio.getDisplay(AudioDisplay.TYPE.WAVEFORM).refreshDisplay();
+        myAudio.getDisplay().setTimePrecision(Integer.parseInt(pres.getText()));
+        myAudio.getDisplay().refreshDisplay();
 
     }//GEN-LAST:event_jButton10ActionPerformed
 

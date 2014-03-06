@@ -226,24 +226,24 @@ public class MultiChannelAudioUIDemo extends javax.swing.JFrame {
     }//GEN-LAST:event_audiFileButtonActionPerformed
 
     private void ch1ZInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ch1ZInActionPerformed
-        ch1ui.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomStep(Integer.parseInt(zstep.getText()));
-        ch1ui.getDisplay(AudioDisplay.TYPE.WAVEFORM).zoomIn();
+        ch1ui.getDisplay().setZoomStep(Integer.parseInt(zstep.getText()));
+        ch1ui.getDisplay().zoomIn();
     }//GEN-LAST:event_ch1ZInActionPerformed
 
     private void ch1ZoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ch1ZoutActionPerformed
-        ch1ui.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomStep(Integer.parseInt(zstep.getText()));
+        ch1ui.getDisplay().setZoomStep(Integer.parseInt(zstep.getText()));
 
-        ch1ui.getDisplay(AudioDisplay.TYPE.WAVEFORM).zoomOut();
+        ch1ui.getDisplay().zoomOut();
     }//GEN-LAST:event_ch1ZoutActionPerformed
 
     private void ch2ZInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ch2ZInActionPerformed
-        ch2ui.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomStep(Integer.parseInt(zstep.getText()));
-        ch2ui.getDisplay(AudioDisplay.TYPE.WAVEFORM).zoomIn();
+        ch2ui.getDisplay().setZoomStep(Integer.parseInt(zstep.getText()));
+        ch2ui.getDisplay().zoomIn();
     }//GEN-LAST:event_ch2ZInActionPerformed
 
     private void ch2ZoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ch2ZoutActionPerformed
-        ch2ui.getDisplay(AudioDisplay.TYPE.WAVEFORM).setZoomStep(Integer.parseInt(zstep.getText()));
-        ch2ui.getDisplay(AudioDisplay.TYPE.WAVEFORM).zoomOut();
+        ch2ui.getDisplay().setZoomStep(Integer.parseInt(zstep.getText()));
+        ch2ui.getDisplay().zoomOut();
     }//GEN-LAST:event_ch2ZoutActionPerformed
 
     private void jCheckBox1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jCheckBox1StateChanged

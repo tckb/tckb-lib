@@ -16,7 +16,7 @@
  */
 package com.tckb.audio.ui;
 
-import com.tckb.audio.NonTrivialAudio;
+import com.tckb.audio.core.NonTrivialAudio;
 import com.tckb.audio.ui.display.AudioDisplay;
 import com.tckb.audio.ui.display.AudioDisplay.TYPE;
 import java.io.File;

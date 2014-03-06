@@ -2,41 +2,30 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tckb.audio;
+package com.tckb.audio.processor;
 
-import com.tckb.audio.NonTrivialAudio.InvalidChannnelException;
+import com.tckb.audio.core.NonTrivialAudio;
+import com.tckb.audio.core.NonTrivialAudio.InvalidChannnelException;
 import com.tckb.audio.part.Block;
 import com.tckb.audio.part.Block.Reduction;
 import com.tckb.audio.ui.display.wave.WaveDisplay;
 import com.tckb.audio.ui.display.wave.WvParams;
 import java.util.Arrays;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author tckb
  */
-public class AudProcessor {
+public class WaveProcessor extends AudioProcessor {
 
-    private static final Logger mylogger = Logger.getLogger("com.tckb.audio");
-    private int srate;
     private int lastBlockSampleCount;
     private int lastBlockRedCount;
     private int fullBlocks;
-    private final NonTrivialAudio audio;
-    private final int channel;
-    private static int renderFactor = 1;
     private WvParams wvParams;
 
-    private AudProcessor(NonTrivialAudio audio, int ch) throws InvalidChannnelException {
-        this.audio = audio;
-        channel = ch;
-
-    }
-
-    public static AudProcessor createProcessor(NonTrivialAudio audio, int ch) throws InvalidChannnelException {
-
+    public WaveProcessor(NonTrivialAudio audio, int ch) throws InvalidChannnelException {
+        super(audio, ch);
         double duration = audio.getDurationInMS();
 
 // Adjust the rendering factor depending on the length of the audio
@@ -52,29 +41,10 @@ public class AudProcessor {
             setRenderFactor(16);
 
         }
-
-        return new AudProcessor(audio, ch);
     }
 
-    /**
-     * @throws com.tckb.audio.NonTrivialAudio.InvalidChannnelException
-     */
-    public final void calcWvParams() throws InvalidChannnelException {
+    public final void calcWvParams() {
 
-        Double[] origDataSamples;
-
-        double dur_secs = audio.getDurationInSeconds();
-
-        if (dur_secs >= (8 * 60)) {
-            mylogger.info("Duration exceeds the limit; using mulitcore data reader; expect high CPU usage!");
-            origDataSamples = audio.getAudioNormData_multicore(channel, (int) Math.round(dur_secs * 0.1));
-
-        } else {
-            mylogger.info("Duration in the limit; using single core data reader");
-            origDataSamples = audio.getAudioNormData(channel); // get the first channel
-        }
-
-        mylogger.log(Level.INFO, "Audio Data read complete: Channel: {0}", channel);
         wvParams.SAMPLE_COUNT = origDataSamples.length;
         initWvParams();
         // TODO: remove usuage bList!
@@ -109,15 +79,15 @@ public class AudProcessor {
     }
 
     private void initWvParams() {
-        srate = audio.getSampleRate();
+        srate = super.source.getSampleRate();
         wvParams.SRATE = srate;
         lastBlockSampleCount = wvParams.SAMPLE_COUNT % WvParams.BLOCK_16K_SAMPLE;
         lastBlockRedCount = lastBlockSampleCount / wvParams.RED_SIZE_SAMPLE; // discard the remaining samples!
         fullBlocks = wvParams.SAMPLE_COUNT / WvParams.BLOCK_16K_SAMPLE;
         wvParams.BLOCK_COUNT = (lastBlockSampleCount != 0) ? (fullBlocks + 1) : fullBlocks;
         wvParams.ADJ_SAMPLE_COUNT = (fullBlocks * wvParams.BLOCK_16K_SAMPLE) + lastBlockRedCount * wvParams.RED_SIZE_SAMPLE; // adjusting the sample count
-        wvParams.DUR_MS = audio.getDurationInMS();
-        wvParams.DUR_SEC = audio.getDurationInSeconds();
+        wvParams.DUR_MS = super.source.getDurationInMS();
+        wvParams.DUR_SEC = super.source.getDurationInSeconds();
         wvParams.RED_COUNT = fullBlocks * (WvParams.BLOCK_16K_SAMPLE / wvParams.RED_SIZE_SAMPLE) + lastBlockRedCount;
 
         mylogger.log(Level.FINE, "Sample count={0}", wvParams.SAMPLE_COUNT);
@@ -128,7 +98,8 @@ public class AudProcessor {
 
     }
 
-    public WaveDisplay getWavePanel() throws InvalidChannnelException {
+    @Override
+    public WaveDisplay getPanel() {
 
         this.wvParams = new WvParams();
 
@@ -138,39 +109,23 @@ public class AudProcessor {
             redSize = WvParams.SAMPLE_SIZE;
         }
         wvParams.RED_SIZE_SAMPLE = redSize;
+
         calcWvParams();
+
         mylogger.info("Rendering...");
 
         WaveDisplay wavePanel = new WaveDisplay(this.wvParams);
         wavePanel.setZoomLevel(wavePanel.getMinZoom());
-        wavePanel.setDisplayInfo(audio.getFile().getName() + " / Channel: " + channel);
-        
-        
-        
+        wavePanel.setDisplayInfo(super.source.getFile().getName() + " / Channel: " + channel);
+
         // BugFix: High memory usuage! peform garbage collection!
         System.gc();
-        
-        
-        
+
         return wavePanel;
     }
 
-    protected static void setRenderFactor(int factor) {
-        renderFactor = factor;
-    }
+    
 
-    /**
-     * Increase render quality at the cost of performance
-     */
-    public void rQualityIN() {
-        renderFactor *= 2;
-
-    }
-
-    public void rQualityOUT() {
-        renderFactor /= 2;
-
-    }
 }
 // Experimental call for check
 //        Double[] origDataSamples_fast = audio.getAudioData_fast2(channel); // get the first channel

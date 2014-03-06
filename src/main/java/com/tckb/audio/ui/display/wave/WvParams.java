@@ -5,13 +5,14 @@
 package com.tckb.audio.ui.display.wave;
 
 import com.tckb.audio.part.Block.Reduction;
+import com.tckb.audio.ui.display.DisplayParams;
 import java.util.ArrayList;
 
 /**
  *
  * @author tckb
  */
-public final class WvParams {
+public final class WvParams implements DisplayParams{
     // Constants
 
     public static final int BLOCK_16K_SAMPLE = 16 * 1024; // 16k samples[2 bytes]-per-block -> 32KB-per-block

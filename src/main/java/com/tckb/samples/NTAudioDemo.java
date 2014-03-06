@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.tckb.samples;
-import com.tckb.audio.NonTrivialAudio;
+import com.tckb.audio.core.NonTrivialAudio;
 import com.tckb.util.Utility;
 import java.io.File;
 import java.util.logging.Level;

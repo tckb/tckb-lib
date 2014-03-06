@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 tckb < Chandra [dot] Tungathurthi [at] rwth-aachen.de >
+ * Copyright (C) 2014 tckb < Chandra [dot] Tungathurthi [at] rwth-aachen.de >
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,28 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tckb.audio;
-
-import java.io.File;
+package com.tckb.audio.ui.display;
 
 /**
  *
  * @author tckb < Chandra [dot] Tungathurthi [at] rwth-aachen.de >
  */
-public class AudioHeader {
-private File audioFile = null;
-private String typeOfEncode=null;
-
-
-public boolean isValidAudioFile(){
+public interface DisplayParams {
     
-    
-    return true;
-}
-
-
-
-
-
-
 }

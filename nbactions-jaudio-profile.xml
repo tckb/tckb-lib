@@ -71,4 +71,20 @@
                 <exec.executable>${profiler.java}</exec.executable>
             </properties>
         </action>
+        <action>
+            <actionName>CUSTOM-Native package</actionName>
+            <displayName>Native package</displayName>
+            <goals>
+                <goal>clean</goal>
+                <goal>jfx:native</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-Jar package</actionName>
+            <displayName>Jar package</displayName>
+            <goals>
+                <goal>clean</goal>
+                <goal>jfx:jar</goal>
+            </goals>
+        </action>
     </actions>
