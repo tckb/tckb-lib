@@ -19,8 +19,6 @@ public class TestBed {
     public static void main(String[] args) throws InvalidChannnelException {
 //        edu.emory.mathcs.jtransforms.fft.DoubleFFT_2D fft_double = new DoubleFFT_2D(1, 10);
 
-
-
 //        try {
 //            //        try {
 //            //            NonTrivialAudio audio = new NonTrivialAudio(new File("/Users/tckb/Msc-MI/Thesis/audio@thesis/orig/audiotest_cut.wav"));
@@ -178,17 +176,16 @@ public class TestBed {
 //            Logger.getLogger(TestBed.class.getName()).log(Level.SEVERE, null, ex);
 //        }
 //
-
-
-
-
         BigDecimal bigNumber1 = new BigDecimal(3.333336, MathContext.DECIMAL64);
         BigDecimal bigNumber2 = new BigDecimal(1212121, MathContext.DECIMAL64);
 
         File tmp = Utility.createTmpFile();
-        Utility.saveObjectToFile(tmp,bigNumber1,bigNumber2);
-
-        System.out.println(" Obhect from file: " + (Object)Utility.getObjectFromFile(tmp)[1]);
+        if (Utility.saveObjectToFile(tmp, bigNumber1, new TestClass())) {
+            System.out.println(" Obhect from file: " + (Object) Utility.getObjectFromFile(tmp)[0]);
+        }else{
+            System.out.println("OOOOPPPPSSs");
+        }
+             
 
     }
 }

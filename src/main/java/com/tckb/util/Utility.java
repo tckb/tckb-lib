@@ -72,7 +72,8 @@ public class Utility {
     /**
      *
      * @param fromFile
-     * @param toFile
+     * @param folder
+     * @param asName
      * @return
      */
     public static File copyToFolderAs(File fromFile, File folder, String asName) {
@@ -100,8 +101,6 @@ public class Utility {
                     return newFile;
                 }
 
-
-
             } catch (IOException ex) {
                 mylogger.log(Level.SEVERE, "Something went wrong; error while copying: ", ex);
             }
@@ -118,11 +117,7 @@ public class Utility {
      */
     public static boolean copyToFolder(File fileToCopy, File folder) {
 
-        if (copyToFolderAs(fileToCopy, folder, fileToCopy.getName()) != null) {
-            return true;
-        } else {
-            return false;
-        }
+        return copyToFolderAs(fileToCopy, folder, fileToCopy.getName()) != null;
     }
 
     public static File makeDuplicate(File thisFile) {
@@ -248,24 +243,20 @@ public class Utility {
 
     public static String readFileAsString(String fname) {
 
-
         return readFile(new File(fname), true);
     }
 
     public static String readFileAsString(File f) {
-
 
         return readFile(f, true);
     }
 
     public static String readFileAsLongString(String fname) {
 
-
         return readFile(new File(fname), false);
     }
 
     public static String readFileAsLongString(File f) {
-
 
         return readFile(f, false);
     }
@@ -279,7 +270,6 @@ public class Utility {
      */
     public static int searchInTxComp(JTextComponent src, String word) {
         int firstOffset = -1;
-
 
         if (word == null || word.isEmpty()) {
             return -1;
@@ -299,9 +289,6 @@ public class Utility {
         word = word.toLowerCase();
         int lastIndex = 0;
         int wordSize = word.length();
-
-
-
 
         while ((lastIndex = content.indexOf(word, lastIndex)) != -1) {
             int endIndex = lastIndex + wordSize;
@@ -354,10 +341,8 @@ public class Utility {
                 mylogger.log(Level.SEVERE, "Error:", ex);
             }
 
-
             return trList;
         }
-
 
     }
 
@@ -412,21 +397,45 @@ public class Utility {
 
     public static String toFormatedTimeString(int milliseconds) {
 
-
         return new TimeConvertor().split(milliseconds);
     }
 
-    public static void saveObjectToFile(File thatFile, Object... thisObject) {
-        mylogger.log(Level.INFO, "Saving object{0} to file: {1}", new Object[]{thisObject.hashCode(), thatFile.getAbsolutePath()});
-        ObjectOutputStream stream;
-        try {
-            stream = new ObjectOutputStream(new FileOutputStream(thatFile));
-            stream.writeObject(thisObject);
-            stream.close();
-        } catch (IOException ex) {
-            mylogger.log(Level.SEVERE, "Error: Can not save the object!", ex.getMessage());
-        }
+    /**
+     * Checks if the object is serializable
+     *
+     * @param thisObject
+     * @return
+     */
+    public static boolean isObjectSerializable(Object thisObject) {
+        return Serializable.class.isAssignableFrom(thisObject.getClass());
+    }
 
+    private static boolean checkIfObjectsAreSerializable(Object... objects) {
+        for (Object o : objects) {
+            if (!isObjectSerializable(o)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean saveObjectToFile(File thatFile, Object... thisObject) {
+
+        if (checkIfObjectsAreSerializable(thisObject)) {
+            mylogger.log(Level.INFO, "Saving {0} objects to file: {1}", new Object[]{thisObject.length, thatFile.getAbsolutePath()});
+            ObjectOutputStream stream;
+            try {
+                stream = new ObjectOutputStream(new FileOutputStream(thatFile));
+                stream.writeObject(thisObject);
+                stream.close();
+            } catch (IOException ex) {
+                mylogger.log(Level.SEVERE, "Error: Can not save the object!", ex.getMessage());
+            }
+        } else {
+            mylogger.log(Level.SEVERE, "At least one or more Objects are not serializable! For saving, all the objects MUST be serializable.");
+            return false;
+        }
+        return true;
     }
 
     public static Object[] getObjectFromFile(File thatFile) {
@@ -437,14 +446,14 @@ public class Utility {
             ObjectInputStream stream = new ObjectInputStream(new FileInputStream(thatFile));
             thatObject = (Object[]) stream.readObject();
             stream.close();
-        } catch (Exception ex) {
+        } catch (IOException ex) {
+            mylogger.log(Level.SEVERE, "Error: Can not extract the object from file", ex.getMessage());
+        } catch (ClassNotFoundException ex) {
             mylogger.log(Level.SEVERE, "Error: Can not extract the object from file", ex.getMessage());
         }
         return thatObject;
     }
 
-    
-    
     private Utility() {
     }
 
@@ -482,7 +491,6 @@ public class Utility {
                 }
             }
 
-
             if (hh > 0) {
                 out.append(hh).append(" Hour(s) ");
             }
@@ -490,8 +498,6 @@ public class Utility {
                 out.append(mm).append(" Minute(s) ");
             }
             out.append(ss).append(" Second(s)");
-
-
 
             return out.toString();
 
