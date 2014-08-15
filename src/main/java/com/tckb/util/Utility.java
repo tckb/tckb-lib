@@ -651,6 +651,15 @@ public class Utility {
 
         }
 
+        public static File getFile(JComponent parent, String message) {
+            JFileChooser jfc = new JFileChooser();
+            jfc.setDialogTitle("Utility: FileChooser:: " + message);
+            jfc.showOpenDialog(parent);
+
+            return jfc.getSelectedFile();
+
+        }
+
         public static File saveFile(JComponent parent) {
             File f = null;
             try {
