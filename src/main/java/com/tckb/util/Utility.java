@@ -61,7 +61,7 @@ public class Utility {
             in.close();
             out.close();
             mylogger.info("... done}");
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             mylogger.log(Level.SEVERE, "Error while copying: ", ex);
 
         }
@@ -356,12 +356,7 @@ public class Utility {
     }
 
     public static File createTmpFile() {
-        try {
-            return File.createTempFile("Utility_temp_file-" + String.valueOf(Utility.tic()), ".tmp");
-        } catch (IOException ex) {
-            mylogger.log(Level.SEVERE, "Error: Can not create temp file ", ex);
-            return null;
-        }
+        return createTmpFile("Utility_temp_file-" + String.valueOf(Utility.tic()), ".tmp");
     }
 
     public static double adjDecimalSep(double value) {
